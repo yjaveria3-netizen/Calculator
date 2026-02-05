@@ -4,6 +4,9 @@
 #include <limits>
 #include <vector>
 #include <string>
+#include <algorithm>
+#include <complex>
+#include <sstream>
 
 // Color codes for better UI
 #define RESET "\033[0m"
@@ -13,6 +16,7 @@
 #define YELLOW "\033[33m"
 #define RED "\033[31m"
 #define BLUE "\033[34m"
+#define MAGENTA "\033[35m"
 
 // Utility functions
 void clearInput()
@@ -135,7 +139,7 @@ double arctangent()
     return std::atan(num);
 }
 
-// Hyperbolic functions (NEW)
+// Hyperbolic functions
 double hyperbolicSine()
 {
     double num = getValidNumber("Enter value: ");
@@ -231,7 +235,7 @@ double nthRoot()
     return std::pow(num, 1.0 / n);
 }
 
-// Advanced functions (NEW)
+// Advanced functions
 double absoluteValue()
 {
     double num = getValidNumber("Enter number: ");
@@ -274,7 +278,7 @@ double roundNum()
     return std::round(num);
 }
 
-// Conversion functions (NEW)
+// Conversion functions
 double degreeToRadian()
 {
     double degrees = getValidNumber("Enter angle in degrees: ");
@@ -287,7 +291,7 @@ double radianToDegree()
     return radians * 180.0 / M_PI;
 }
 
-// Statistical functions (NEW)
+// Statistical functions
 void statistics()
 {
     int n;
@@ -311,11 +315,567 @@ void statistics()
     }
     variance /= n;
 
+    // Find min and max
+    double minVal = *std::min_element(numbers.begin(), numbers.end());
+    double maxVal = *std::max_element(numbers.begin(), numbers.end());
+
+    // Sort for median
+    std::vector<double> sorted = numbers;
+    std::sort(sorted.begin(), sorted.end());
+    double median;
+    if (n % 2 == 0)
+    {
+        median = (sorted[n / 2 - 1] + sorted[n / 2]) / 2.0;
+    }
+    else
+    {
+        median = sorted[n / 2];
+    }
+
     std::cout << GREEN << "\n=== Statistics ===" << RESET << std::endl;
+    std::cout << "Count: " << n << std::endl;
     std::cout << "Sum: " << sum << std::endl;
     std::cout << "Mean: " << mean << std::endl;
+    std::cout << "Median: " << median << std::endl;
+    std::cout << "Minimum: " << minVal << std::endl;
+    std::cout << "Maximum: " << maxVal << std::endl;
+    std::cout << "Range: " << (maxVal - minVal) << std::endl;
     std::cout << "Variance: " << variance << std::endl;
     std::cout << "Standard Deviation: " << std::sqrt(variance) << std::endl;
+}
+
+// ========== NEW FEATURES ==========
+
+// Permutation and Combination
+double permutation()
+{
+    int n = static_cast<int>(getValidNumber("Enter n: "));
+    int r = static_cast<int>(getValidNumber("Enter r: "));
+
+    while (n < 0 || r < 0 || r > n || n > 20)
+    {
+        std::cout << RED << "Error: Invalid values! (0 <= r <= n <= 20)" << RESET << std::endl;
+        n = static_cast<int>(getValidNumber("Enter n: "));
+        r = static_cast<int>(getValidNumber("Enter r: "));
+    }
+
+    double result = 1;
+    for (int i = 0; i < r; i++)
+    {
+        result *= (n - i);
+    }
+    return result;
+}
+
+double combination()
+{
+    int n = static_cast<int>(getValidNumber("Enter n: "));
+    int r = static_cast<int>(getValidNumber("Enter r: "));
+
+    while (n < 0 || r < 0 || r > n || n > 20)
+    {
+        std::cout << RED << "Error: Invalid values! (0 <= r <= n <= 20)" << RESET << std::endl;
+        n = static_cast<int>(getValidNumber("Enter n: "));
+        r = static_cast<int>(getValidNumber("Enter r: "));
+    }
+
+    double numerator = 1, denominator = 1;
+    for (int i = 0; i < r; i++)
+    {
+        numerator *= (n - i);
+        denominator *= (i + 1);
+    }
+    return numerator / denominator;
+}
+
+// GCD and LCM
+int gcd(int a, int b)
+{
+    a = std::abs(a);
+    b = std::abs(b);
+    while (b != 0)
+    {
+        int temp = b;
+        b = a % b;
+        a = temp;
+    }
+    return a;
+}
+
+void gcdLcm()
+{
+    int a = static_cast<int>(getValidNumber("Enter first integer: "));
+    int b = static_cast<int>(getValidNumber("Enter second integer: "));
+
+    int gcdVal = gcd(a, b);
+    int lcmVal = std::abs(a * b) / gcdVal;
+
+    std::cout << GREEN << "\n=== Results ===" << RESET << std::endl;
+    std::cout << "GCD: " << gcdVal << std::endl;
+    std::cout << "LCM: " << lcmVal << std::endl;
+}
+
+// Quadratic Equation Solver
+void quadraticSolver()
+{
+    std::cout << CYAN << "\nSolving: ax² + bx + c = 0" << RESET << std::endl;
+    double a = getValidNumber("Enter a: ");
+    while (a == 0)
+    {
+        std::cout << RED << "Coefficient 'a' cannot be zero!" << RESET << std::endl;
+        a = getValidNumber("Enter a: ");
+    }
+    double b = getValidNumber("Enter b: ");
+    double c = getValidNumber("Enter c: ");
+
+    double discriminant = b * b - 4 * a * c;
+
+    std::cout << GREEN << "\n=== Solution ===" << RESET << std::endl;
+    std::cout << "Discriminant: " << discriminant << std::endl;
+
+    if (discriminant > 0)
+    {
+        double x1 = (-b + std::sqrt(discriminant)) / (2 * a);
+        double x2 = (-b - std::sqrt(discriminant)) / (2 * a);
+        std::cout << "Two real roots:" << std::endl;
+        std::cout << "x₁ = " << x1 << std::endl;
+        std::cout << "x₂ = " << x2 << std::endl;
+    }
+    else if (discriminant == 0)
+    {
+        double x = -b / (2 * a);
+        std::cout << "One real root:" << std::endl;
+        std::cout << "x = " << x << std::endl;
+    }
+    else
+    {
+        double realPart = -b / (2 * a);
+        double imagPart = std::sqrt(-discriminant) / (2 * a);
+        std::cout << "Two complex roots:" << std::endl;
+        std::cout << "x₁ = " << realPart << " + " << imagPart << "i" << std::endl;
+        std::cout << "x₂ = " << realPart << " - " << imagPart << "i" << std::endl;
+    }
+}
+
+// Matrix Operations
+void matrixAddition()
+{
+    int rows, cols;
+    std::cout << "Enter number of rows: ";
+    std::cin >> rows;
+    std::cout << "Enter number of columns: ";
+    std::cin >> cols;
+
+    std::vector<std::vector<double>> matrix1(rows, std::vector<double>(cols));
+    std::vector<std::vector<double>> matrix2(rows, std::vector<double>(cols));
+    std::vector<std::vector<double>> result(rows, std::vector<double>(cols));
+
+    std::cout << "\nEnter elements of Matrix 1:" << std::endl;
+    for (int i = 0; i < rows; i++)
+    {
+        for (int j = 0; j < cols; j++)
+        {
+            matrix1[i][j] = getValidNumber("Element [" + std::to_string(i) + "][" + std::to_string(j) + "]: ");
+        }
+    }
+
+    std::cout << "\nEnter elements of Matrix 2:" << std::endl;
+    for (int i = 0; i < rows; i++)
+    {
+        for (int j = 0; j < cols; j++)
+        {
+            matrix2[i][j] = getValidNumber("Element [" + std::to_string(i) + "][" + std::to_string(j) + "]: ");
+        }
+    }
+
+    for (int i = 0; i < rows; i++)
+    {
+        for (int j = 0; j < cols; j++)
+        {
+            result[i][j] = matrix1[i][j] + matrix2[i][j];
+        }
+    }
+
+    std::cout << GREEN << "\n=== Result Matrix ===" << RESET << std::endl;
+    for (int i = 0; i < rows; i++)
+    {
+        for (int j = 0; j < cols; j++)
+        {
+            std::cout << std::setw(10) << result[i][j] << " ";
+        }
+        std::cout << std::endl;
+    }
+}
+
+void matrixMultiplication()
+{
+    int rows1, cols1, rows2, cols2;
+    std::cout << "Matrix 1 - Enter number of rows: ";
+    std::cin >> rows1;
+    std::cout << "Matrix 1 - Enter number of columns: ";
+    std::cin >> cols1;
+    std::cout << "Matrix 2 - Enter number of rows: ";
+    std::cin >> rows2;
+    std::cout << "Matrix 2 - Enter number of columns: ";
+    std::cin >> cols2;
+
+    while (cols1 != rows2)
+    {
+        std::cout << RED << "Error: Matrix 1 columns must equal Matrix 2 rows!" << RESET << std::endl;
+        std::cout << "Matrix 1 - Enter number of columns: ";
+        std::cin >> cols1;
+        std::cout << "Matrix 2 - Enter number of rows: ";
+        std::cin >> rows2;
+    }
+
+    std::vector<std::vector<double>> matrix1(rows1, std::vector<double>(cols1));
+    std::vector<std::vector<double>> matrix2(rows2, std::vector<double>(cols2));
+    std::vector<std::vector<double>> result(rows1, std::vector<double>(cols2, 0));
+
+    std::cout << "\nEnter elements of Matrix 1:" << std::endl;
+    for (int i = 0; i < rows1; i++)
+    {
+        for (int j = 0; j < cols1; j++)
+        {
+            matrix1[i][j] = getValidNumber("Element [" + std::to_string(i) + "][" + std::to_string(j) + "]: ");
+        }
+    }
+
+    std::cout << "\nEnter elements of Matrix 2:" << std::endl;
+    for (int i = 0; i < rows2; i++)
+    {
+        for (int j = 0; j < cols2; j++)
+        {
+            matrix2[i][j] = getValidNumber("Element [" + std::to_string(i) + "][" + std::to_string(j) + "]: ");
+        }
+    }
+
+    for (int i = 0; i < rows1; i++)
+    {
+        for (int j = 0; j < cols2; j++)
+        {
+            for (int k = 0; k < cols1; k++)
+            {
+                result[i][j] += matrix1[i][k] * matrix2[k][j];
+            }
+        }
+    }
+
+    std::cout << GREEN << "\n=== Result Matrix ===" << RESET << std::endl;
+    for (int i = 0; i < rows1; i++)
+    {
+        for (int j = 0; j < cols2; j++)
+        {
+            std::cout << std::setw(10) << result[i][j] << " ";
+        }
+        std::cout << std::endl;
+    }
+}
+
+// Number System Conversions
+void numberSystemConversion()
+{
+    std::cout << CYAN << "\n=== Number System Conversion ===" << RESET << std::endl;
+    std::cout << "1. Decimal to Binary\n";
+    std::cout << "2. Decimal to Octal\n";
+    std::cout << "3. Decimal to Hexadecimal\n";
+    std::cout << "4. Binary to Decimal\n";
+    std::cout << "5. Octal to Decimal\n";
+    std::cout << "6. Hexadecimal to Decimal\n";
+
+    int choice = getValidChoice(1, 6);
+    long long num;
+
+    switch (choice)
+    {
+    case 1:
+        num = static_cast<long long>(getValidNumber("Enter decimal number: "));
+        std::cout << GREEN << "Binary: ";
+        if (num == 0)
+            std::cout << "0";
+        else
+        {
+            std::string binary = "";
+            long long temp = std::abs(num);
+            while (temp > 0)
+            {
+                binary = std::to_string(temp % 2) + binary;
+                temp /= 2;
+            }
+            if (num < 0)
+                std::cout << "-";
+            std::cout << binary;
+        }
+        std::cout << RESET << std::endl;
+        break;
+
+    case 2:
+        num = static_cast<long long>(getValidNumber("Enter decimal number: "));
+        std::cout << GREEN << "Octal: " << std::oct << num << RESET << std::endl;
+        break;
+
+    case 3:
+        num = static_cast<long long>(getValidNumber("Enter decimal number: "));
+        std::cout << GREEN << "Hexadecimal: " << std::hex << std::uppercase << num << RESET << std::endl;
+        break;
+
+    case 4:
+    {
+        std::string binary;
+        std::cout << "Enter binary number: ";
+        std::cin >> binary;
+        long long decimal = 0;
+        for (char c : binary)
+        {
+            if (c != '0' && c != '1')
+            {
+                std::cout << RED << "Invalid binary number!" << RESET << std::endl;
+                return;
+            }
+            decimal = decimal * 2 + (c - '0');
+        }
+        std::cout << GREEN << "Decimal: " << decimal << RESET << std::endl;
+        break;
+    }
+
+    case 5:
+    {
+        std::string octal;
+        std::cout << "Enter octal number: ";
+        std::cin >> octal;
+        long long decimal = 0;
+        for (char c : octal)
+        {
+            if (c < '0' || c > '7')
+            {
+                std::cout << RED << "Invalid octal number!" << RESET << std::endl;
+                return;
+            }
+            decimal = decimal * 8 + (c - '0');
+        }
+        std::cout << GREEN << "Decimal: " << decimal << RESET << std::endl;
+        break;
+    }
+
+    case 6:
+    {
+        std::string hex;
+        std::cout << "Enter hexadecimal number: ";
+        std::cin >> hex;
+        long long decimal = 0;
+        for (char c : hex)
+        {
+            c = toupper(c);
+            if ((c < '0' || c > '9') && (c < 'A' || c > 'F'))
+            {
+                std::cout << RED << "Invalid hexadecimal number!" << RESET << std::endl;
+                return;
+            }
+            int digit = (c >= 'A') ? (c - 'A' + 10) : (c - '0');
+            decimal = decimal * 16 + digit;
+        }
+        std::cout << GREEN << "Decimal: " << decimal << RESET << std::endl;
+        break;
+    }
+    }
+}
+
+// Unit Conversions
+void unitConversions()
+{
+    std::cout << CYAN << "\n=== Unit Conversions ===" << RESET << std::endl;
+    std::cout << "1. Temperature (C ↔ F ↔ K)\n";
+    std::cout << "2. Length (m ↔ ft ↔ in)\n";
+    std::cout << "3. Weight (kg ↔ lb ↔ oz)\n";
+    std::cout << "4. Speed (km/h ↔ mph ↔ m/s)\n";
+    std::cout << "5. Area (m² ↔ ft² ↔ acres)\n";
+    std::cout << "6. Volume (L ↔ gal ↔ ml)\n";
+
+    int choice = getValidChoice(1, 6);
+    double value, result;
+
+    switch (choice)
+    {
+    case 1: // Temperature
+    {
+        std::cout << "1. Celsius to Fahrenheit\n";
+        std::cout << "2. Fahrenheit to Celsius\n";
+        std::cout << "3. Celsius to Kelvin\n";
+        std::cout << "4. Kelvin to Celsius\n";
+        int tempChoice = getValidChoice(1, 4);
+        value = getValidNumber("Enter value: ");
+        switch (tempChoice)
+        {
+        case 1:
+            result = (value * 9 / 5) + 32;
+            std::cout << GREEN << value << "°C = " << result << "°F" << RESET << std::endl;
+            break;
+        case 2:
+            result = (value - 32) * 5 / 9;
+            std::cout << GREEN << value << "°F = " << result << "°C" << RESET << std::endl;
+            break;
+        case 3:
+            result = value + 273.15;
+            std::cout << GREEN << value << "°C = " << result << "K" << RESET << std::endl;
+            break;
+        case 4:
+            result = value - 273.15;
+            std::cout << GREEN << value << "K = " << result << "°C" << RESET << std::endl;
+            break;
+        }
+        break;
+    }
+
+    case 2: // Length
+    {
+        std::cout << "1. Meters to Feet\n";
+        std::cout << "2. Feet to Meters\n";
+        std::cout << "3. Meters to Inches\n";
+        std::cout << "4. Inches to Meters\n";
+        int lenChoice = getValidChoice(1, 4);
+        value = getValidNumber("Enter value: ");
+        switch (lenChoice)
+        {
+        case 1:
+            result = value * 3.28084;
+            std::cout << GREEN << value << " m = " << result << " ft" << RESET << std::endl;
+            break;
+        case 2:
+            result = value / 3.28084;
+            std::cout << GREEN << value << " ft = " << result << " m" << RESET << std::endl;
+            break;
+        case 3:
+            result = value * 39.3701;
+            std::cout << GREEN << value << " m = " << result << " in" << RESET << std::endl;
+            break;
+        case 4:
+            result = value / 39.3701;
+            std::cout << GREEN << value << " in = " << result << " m" << RESET << std::endl;
+            break;
+        }
+        break;
+    }
+
+    case 3: // Weight
+    {
+        std::cout << "1. Kilograms to Pounds\n";
+        std::cout << "2. Pounds to Kilograms\n";
+        std::cout << "3. Kilograms to Ounces\n";
+        std::cout << "4. Ounces to Kilograms\n";
+        int weightChoice = getValidChoice(1, 4);
+        value = getValidNumber("Enter value: ");
+        switch (weightChoice)
+        {
+        case 1:
+            result = value * 2.20462;
+            std::cout << GREEN << value << " kg = " << result << " lb" << RESET << std::endl;
+            break;
+        case 2:
+            result = value / 2.20462;
+            std::cout << GREEN << value << " lb = " << result << " kg" << RESET << std::endl;
+            break;
+        case 3:
+            result = value * 35.274;
+            std::cout << GREEN << value << " kg = " << result << " oz" << RESET << std::endl;
+            break;
+        case 4:
+            result = value / 35.274;
+            std::cout << GREEN << value << " oz = " << result << " kg" << RESET << std::endl;
+            break;
+        }
+        break;
+    }
+
+    case 4: // Speed
+    {
+        std::cout << "1. km/h to mph\n";
+        std::cout << "2. mph to km/h\n";
+        std::cout << "3. m/s to km/h\n";
+        std::cout << "4. km/h to m/s\n";
+        int speedChoice = getValidChoice(1, 4);
+        value = getValidNumber("Enter value: ");
+        switch (speedChoice)
+        {
+        case 1:
+            result = value * 0.621371;
+            std::cout << GREEN << value << " km/h = " << result << " mph" << RESET << std::endl;
+            break;
+        case 2:
+            result = value / 0.621371;
+            std::cout << GREEN << value << " mph = " << result << " km/h" << RESET << std::endl;
+            break;
+        case 3:
+            result = value * 3.6;
+            std::cout << GREEN << value << " m/s = " << result << " km/h" << RESET << std::endl;
+            break;
+        case 4:
+            result = value / 3.6;
+            std::cout << GREEN << value << " km/h = " << result << " m/s" << RESET << std::endl;
+            break;
+        }
+        break;
+    }
+
+    case 5: // Area
+    {
+        std::cout << "1. m² to ft²\n";
+        std::cout << "2. ft² to m²\n";
+        std::cout << "3. m² to acres\n";
+        std::cout << "4. acres to m²\n";
+        int areaChoice = getValidChoice(1, 4);
+        value = getValidNumber("Enter value: ");
+        switch (areaChoice)
+        {
+        case 1:
+            result = value * 10.7639;
+            std::cout << GREEN << value << " m² = " << result << " ft²" << RESET << std::endl;
+            break;
+        case 2:
+            result = value / 10.7639;
+            std::cout << GREEN << value << " ft² = " << result << " m²" << RESET << std::endl;
+            break;
+        case 3:
+            result = value / 4046.86;
+            std::cout << GREEN << value << " m² = " << result << " acres" << RESET << std::endl;
+            break;
+        case 4:
+            result = value * 4046.86;
+            std::cout << GREEN << value << " acres = " << result << " m²" << RESET << std::endl;
+            break;
+        }
+        break;
+    }
+
+    case 6: // Volume
+    {
+        std::cout << "1. Liters to Gallons\n";
+        std::cout << "2. Gallons to Liters\n";
+        std::cout << "3. Liters to Milliliters\n";
+        std::cout << "4. Milliliters to Liters\n";
+        int volChoice = getValidChoice(1, 4);
+        value = getValidNumber("Enter value: ");
+        switch (volChoice)
+        {
+        case 1:
+            result = value * 0.264172;
+            std::cout << GREEN << value << " L = " << result << " gal" << RESET << std::endl;
+            break;
+        case 2:
+            result = value / 0.264172;
+            std::cout << GREEN << value << " gal = " << result << " L" << RESET << std::endl;
+            break;
+        case 3:
+            result = value * 1000;
+            std::cout << GREEN << value << " L = " << result << " mL" << RESET << std::endl;
+            break;
+        case 4:
+            result = value / 1000;
+            std::cout << GREEN << value << " mL = " << result << " L" << RESET << std::endl;
+            break;
+        }
+        break;
+    }
+    }
 }
 
 // Display menu
@@ -324,7 +884,7 @@ void displayMenu()
     std::cout << "\n"
               << BOLD << CYAN;
     std::cout << "╔════════════════════════════════════════════════════════════════╗\n";
-    std::cout << "║           ADVANCED SCIENTIFIC CALCULATOR                       ║\n";
+    std::cout << "║                ULTIMATE SCIENTIFIC CALCULATOR                  ║\n";
     std::cout << "╚════════════════════════════════════════════════════════════════╝\n";
     std::cout << RESET;
 
@@ -348,8 +908,15 @@ void displayMenu()
     std::cout << "24. Factorial (n!)      25. Ceiling             26. Floor\n";
     std::cout << "27. Round               28. Statistics          \n";
 
-    std::cout << BLUE << "\n┌─── Conversions ───┐" << RESET << std::endl;
+    std::cout << BLUE << "\n┌─── Angular Conversions ───┐" << RESET << std::endl;
     std::cout << "29. Degrees to Radians  30. Radians to Degrees\n";
+
+    std::cout << MAGENTA << "\n┌─── Advanced Math ───┐" << RESET << std::endl;
+    std::cout << "31. Permutation (nPr)   32. Combination (nCr)   33. GCD & LCM\n";
+    std::cout << "34. Quadratic Solver    35. Matrix Addition     36. Matrix Multiplication\n";
+
+    std::cout << MAGENTA << "\n┌─── Conversions ───┐" << RESET << std::endl;
+    std::cout << "37. Number Systems      38. Unit Conversions\n";
 
     std::cout << RED << "\n 0. Exit Calculator\n"
               << RESET << std::endl;
@@ -366,7 +933,7 @@ int main()
     do
     {
         displayMenu();
-        choice = getValidChoice(0, 30);
+        choice = getValidChoice(0, 38);
 
         if (choice == 0)
         {
@@ -494,12 +1061,44 @@ int main()
             result = radianToDegree();
             break;
 
+        // NEW FEATURES
+        case 31:
+            result = permutation();
+            break;
+        case 32:
+            result = combination();
+            break;
+        case 33:
+            gcdLcm();
+            validOperation = false;
+            break;
+        case 34:
+            quadraticSolver();
+            validOperation = false;
+            break;
+        case 35:
+            matrixAddition();
+            validOperation = false;
+            break;
+        case 36:
+            matrixMultiplication();
+            validOperation = false;
+            break;
+        case 37:
+            numberSystemConversion();
+            validOperation = false;
+            break;
+        case 38:
+            unitConversions();
+            validOperation = false;
+            break;
+
         default:
             validOperation = false;
             break;
         }
 
-        if (validOperation && choice != 28)
+        if (validOperation && choice != 28 && choice != 33 && choice != 34 && choice != 35 && choice != 36 && choice != 37 && choice != 38)
         {
             std::cout << GREEN << "\n┌─────────────────────┐\n";
             std::cout << "│ Result: " << BOLD << result << RESET << GREEN << "\n";
