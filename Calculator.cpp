@@ -1367,12 +1367,6 @@ int main()
 
     std::cout << std::fixed << std::setprecision(6);
 
-    std::cout << theme->primary << "╔══════════════════════════════════════════════════════════╗\n";
-    std::cout << "║  Welcome to Ultimate Scientific Calculator v3.0!         ║\n";
-    std::cout << "║  New: Expression Parser, Memory, History, Themes & More  ║\n";
-    std::cout << "╚══════════════════════════════════════════════════════════╝\n"
-              << theme->reset;
-
     do
     {
         displayMenu();
