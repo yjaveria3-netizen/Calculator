@@ -1321,7 +1321,7 @@ void displayMenu()
     std::cout << "\n"
               << theme->bold << theme->primary;
     std::cout << "╔════════════════════════════════════════════════════════════════╗\n";
-    std::cout << "║         ULTIMATE SCIENTIFIC CALCULATOR v3.0                    ║\n";
+    std::cout << "║               ULTIMATE SCIENTIFIC CALCULATOR                   ║\n";
     std::cout << "╚════════════════════════════════════════════════════════════════╝\n";
     std::cout << theme->reset;
 
