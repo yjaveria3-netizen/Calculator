@@ -1,228 +1,517 @@
 #include <iostream>
 #include <cmath>
 #include <iomanip>
+#include <limits>
+#include <vector>
+#include <string>
 
+// Color codes for better UI
+#define RESET "\033[0m"
+#define BOLD "\033[1m"
+#define CYAN "\033[36m"
+#define GREEN "\033[32m"
+#define YELLOW "\033[33m"
+#define RED "\033[31m"
+#define BLUE "\033[34m"
 
-
-// Functions
-
-double add(double num1, double num2) {
-    double result = num1 + num2;
-    return result;
+// Utility functions
+void clearInput()
+{
+    std::cin.clear();
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 }
 
-double subtract(double num1, double num2) {
-    double result = num1 - num2;
-    return result;
-}
-
-double multiply(double num1, double num2) {
-    double result = num1 * num2;
-    return result;
-}
-
-double divide(double num1, double num2) {
-    do {
-        if (num2 == 0) {
-            std::cout << "Error: Division by zero is undefined...." << std::endl;
-            std::cout << "Enter Number 2 again: ";
-            std::cin >> num2;
+double getValidNumber(const std::string &prompt)
+{
+    double num;
+    while (true)
+    {
+        std::cout << prompt;
+        if (std::cin >> num)
+        {
+            return num;
         }
-    } while (num2 == 0);
-
-    double result = num1 / num2; // fixed division order
-    return result;
+        std::cout << RED << "Invalid input! Please enter a valid number." << RESET << std::endl;
+        clearInput();
+    }
 }
 
-// Trigonometric ratios
-
-double sin() {
-    double num;
-    std::cout << "Enter number in radian: ";
-    std::cin >> num;
-    double result = std::sin(num);
-    return result;
-}
-
-double cos() {
-    double num;
-    std::cout << "Enter number in radian: ";
-    std::cin >> num;
-    double result = std::cos(num);
-    return result;
-}
-
-double tan() {
-    double num;
-    std::cout << "Enter number in radian: ";
-    std::cin >> num;
-    double result = std::tan(num);
-    return result;
-}
-
-double negsin() {
-    double num;
-    std::cout << "Enter number in radian: ";
-    std::cin >> num;
-    double result = std::asin(num);
-    return result;
-}
-
-double negcos() {
-    double num;
-    std::cout << "Enter number in radian: ";
-    std::cin >> num;
-    double result = std::acos(num);
-    return result;
-}
-
-double negtan() {
-    double num;
-    std::cout << "Enter number in radian: ";
-    std::cin >> num;
-    double result = std::atan(num);
-    return result;
-}
-
-// Exponential functions
-
-double power() {
-    double base;
-    std::cout << "Enter base: ";
-    std::cin >> base;
-    double exponent;
-    std::cout << "Enter power: ";
-    std::cin >> exponent;
-    double result = std::pow(base, exponent);
-    return result;
-}
-
-double expo() {
-    double num;
-    std::cout << "Enter a number: ";
-    std::cin >> num;
-    double result = std::exp(num);
-    return result;
-}
-
-double logarithm() {
-    double num;
-    std::cout << "Enter a number: ";
-    std::cin >> num;
-    double result = std::log(num);
-    return result;
-}
-
-double logarithm10() {
-    double num;
-    std::cout << "Enter a number: ";
-    std::cin >> num;
-    double result = std::log10(num);
-    return result;
-}
-
-// Roots
-
-double square_root() {
-    double num;
-    std::cout << "Enter a number: ";
-    std::cin >> num;
-    double result = std::sqrt(num);
-    return result;
-}
-
-double cube_root() {
-    double num;
-    std::cout << "Enter a number: ";
-    std::cin >> num;
-    double result = std::cbrt(num);
-    return result;
-}
-
-// Main program
-
-int main() {
-    double a, b;
+int getValidChoice(int min, int max)
+{
     int choice;
-    double answer;
-    char user;
+    while (true)
+    {
+        std::cout << YELLOW << "Enter your choice (" << min << "-" << max << "): " << RESET;
+        if (std::cin >> choice && choice >= min && choice <= max)
+        {
+            return choice;
+        }
+        std::cout << RED << "Invalid choice! Please enter a number between "
+                  << min << " and " << max << "." << RESET << std::endl;
+        clearInput();
+    }
+}
 
-    do {
-        std::cout << std::setw(70) << "Science Calculator" << std::endl;
+// Basic arithmetic operations
+double add(double num1, double num2)
+{
+    return num1 + num2;
+}
 
-        // Menu
-        std::cout << "|Basic Operation|" << std::setw(35) << "|Trigonometric Functions|" 
-                  << std::setw(35) << "|Exponential_Log Functions|" 
-                  << std::setw(30) << "|Roots Function|" << std::endl;
+double subtract(double num1, double num2)
+{
+    return num1 - num2;
+}
 
-        std::cout << " 1.Addition(+)" << std::setw(23) << " 5.sin()"
-                  << std::setw(40) << " 11.exp(e^x)" 
-                  << std::setw(40) << " 15.Square root" << std::endl;
+double multiply(double num1, double num2)
+{
+    return num1 * num2;
+}
 
-        std::cout << " 2.Subtraction(-)" << std::setw(20) << " 6.cos()"
-                  << std::setw(45) << " 12.pow(base^exp)" 
-                  << std::setw(33) << " 16.Cube Root" << std::endl;
+double divide(double num1, double num2)
+{
+    while (num2 == 0)
+    {
+        std::cout << RED << "Error: Division by zero is undefined!" << RESET << std::endl;
+        num2 = getValidNumber("Enter divisor again: ");
+    }
+    return num1 / num2;
+}
 
-        std::cout << " 3.Multipication(*)" << std::setw(18) << " 7.tan()"
-                  << std::setw(37) << " 13.log()" << std::endl;
+double modulus(double num1, double num2)
+{
+    while (num2 == 0)
+    {
+        std::cout << RED << "Error: Modulus by zero is undefined!" << RESET << std::endl;
+        num2 = getValidNumber("Enter divisor again: ");
+    }
+    return std::fmod(num1, num2);
+}
 
-        std::cout << " 4.Division(/)" << std::setw(26) << " 8.sin^(-1)" 
-                  << std::setw(36) << " 14.log10()" << std::endl;
+// Trigonometric functions
+double sine()
+{
+    double num = getValidNumber("Enter angle in radians: ");
+    return std::sin(num);
+}
 
-        std::cout << std::setw(40) << "9.cos^(-1)" << std::endl;
-        std::cout << std::setw(40) << "10.tan^(-1)" << std::endl;
+double cosine()
+{
+    double num = getValidNumber("Enter angle in radians: ");
+    return std::cos(num);
+}
 
-        // Taking choice from user
-        std::cout << "Enter your choice (1-16): ";
-        std::cin >> choice;
+double tangent()
+{
+    double num = getValidNumber("Enter angle in radians: ");
+    return std::tan(num);
+}
 
-        // Error handling
-        while (choice < 1 || choice > 16) {
-            std::cout << "Invalid choice. Please enter a valid option(1-16): ";
-            std::cin >> choice;
+double arcsine()
+{
+    double num = getValidNumber("Enter value [-1, 1]: ");
+    while (num < -1 || num > 1)
+    {
+        std::cout << RED << "Error: Input must be between -1 and 1!" << RESET << std::endl;
+        num = getValidNumber("Enter value [-1, 1]: ");
+    }
+    return std::asin(num);
+}
+
+double arccosine()
+{
+    double num = getValidNumber("Enter value [-1, 1]: ");
+    while (num < -1 || num > 1)
+    {
+        std::cout << RED << "Error: Input must be between -1 and 1!" << RESET << std::endl;
+        num = getValidNumber("Enter value [-1, 1]: ");
+    }
+    return std::acos(num);
+}
+
+double arctangent()
+{
+    double num = getValidNumber("Enter value: ");
+    return std::atan(num);
+}
+
+// Hyperbolic functions (NEW)
+double hyperbolicSine()
+{
+    double num = getValidNumber("Enter value: ");
+    return std::sinh(num);
+}
+
+double hyperbolicCosine()
+{
+    double num = getValidNumber("Enter value: ");
+    return std::cosh(num);
+}
+
+double hyperbolicTangent()
+{
+    double num = getValidNumber("Enter value: ");
+    return std::tanh(num);
+}
+
+// Exponential and logarithmic functions
+double power()
+{
+    double base = getValidNumber("Enter base: ");
+    double exponent = getValidNumber("Enter exponent: ");
+    return std::pow(base, exponent);
+}
+
+double exponential()
+{
+    double num = getValidNumber("Enter value: ");
+    return std::exp(num);
+}
+
+double naturalLog()
+{
+    double num = getValidNumber("Enter positive number: ");
+    while (num <= 0)
+    {
+        std::cout << RED << "Error: Logarithm undefined for non-positive numbers!" << RESET << std::endl;
+        num = getValidNumber("Enter positive number: ");
+    }
+    return std::log(num);
+}
+
+double log10()
+{
+    double num = getValidNumber("Enter positive number: ");
+    while (num <= 0)
+    {
+        std::cout << RED << "Error: Logarithm undefined for non-positive numbers!" << RESET << std::endl;
+        num = getValidNumber("Enter positive number: ");
+    }
+    return std::log10(num);
+}
+
+double log2()
+{
+    double num = getValidNumber("Enter positive number: ");
+    while (num <= 0)
+    {
+        std::cout << RED << "Error: Logarithm undefined for non-positive numbers!" << RESET << std::endl;
+        num = getValidNumber("Enter positive number: ");
+    }
+    return std::log2(num);
+}
+
+// Root functions
+double squareRoot()
+{
+    double num = getValidNumber("Enter non-negative number: ");
+    while (num < 0)
+    {
+        std::cout << RED << "Error: Square root of negative number is complex!" << RESET << std::endl;
+        num = getValidNumber("Enter non-negative number: ");
+    }
+    return std::sqrt(num);
+}
+
+double cubeRoot()
+{
+    double num = getValidNumber("Enter number: ");
+    return std::cbrt(num);
+}
+
+double nthRoot()
+{
+    double num = getValidNumber("Enter number: ");
+    double n = getValidNumber("Enter root degree: ");
+    while (n == 0)
+    {
+        std::cout << RED << "Error: Root degree cannot be zero!" << RESET << std::endl;
+        n = getValidNumber("Enter root degree: ");
+    }
+    return std::pow(num, 1.0 / n);
+}
+
+// Advanced functions (NEW)
+double absoluteValue()
+{
+    double num = getValidNumber("Enter number: ");
+    return std::abs(num);
+}
+
+double factorial()
+{
+    int num;
+    while (true)
+    {
+        num = static_cast<int>(getValidNumber("Enter non-negative integer: "));
+        if (num >= 0 && num <= 20)
+            break;
+        std::cout << RED << "Error: Enter a value between 0 and 20!" << RESET << std::endl;
+    }
+    double result = 1;
+    for (int i = 2; i <= num; i++)
+    {
+        result *= i;
+    }
+    return result;
+}
+
+double ceiling()
+{
+    double num = getValidNumber("Enter number: ");
+    return std::ceil(num);
+}
+
+double floor()
+{
+    double num = getValidNumber("Enter number: ");
+    return std::floor(num);
+}
+
+double roundNum()
+{
+    double num = getValidNumber("Enter number: ");
+    return std::round(num);
+}
+
+// Conversion functions (NEW)
+double degreeToRadian()
+{
+    double degrees = getValidNumber("Enter angle in degrees: ");
+    return degrees * M_PI / 180.0;
+}
+
+double radianToDegree()
+{
+    double radians = getValidNumber("Enter angle in radians: ");
+    return radians * 180.0 / M_PI;
+}
+
+// Statistical functions (NEW)
+void statistics()
+{
+    int n;
+    std::cout << "How many numbers? ";
+    std::cin >> n;
+
+    std::vector<double> numbers(n);
+    double sum = 0, mean, variance = 0;
+
+    for (int i = 0; i < n; i++)
+    {
+        numbers[i] = getValidNumber("Enter number " + std::to_string(i + 1) + ": ");
+        sum += numbers[i];
+    }
+
+    mean = sum / n;
+
+    for (int i = 0; i < n; i++)
+    {
+        variance += std::pow(numbers[i] - mean, 2);
+    }
+    variance /= n;
+
+    std::cout << GREEN << "\n=== Statistics ===" << RESET << std::endl;
+    std::cout << "Sum: " << sum << std::endl;
+    std::cout << "Mean: " << mean << std::endl;
+    std::cout << "Variance: " << variance << std::endl;
+    std::cout << "Standard Deviation: " << std::sqrt(variance) << std::endl;
+}
+
+// Display menu
+void displayMenu()
+{
+    std::cout << "\n"
+              << BOLD << CYAN;
+    std::cout << "╔════════════════════════════════════════════════════════════════╗\n";
+    std::cout << "║           ADVANCED SCIENTIFIC CALCULATOR                       ║\n";
+    std::cout << "╚════════════════════════════════════════════════════════════════╝\n";
+    std::cout << RESET;
+
+    std::cout << BLUE << "\n┌─── Basic Operations ───┐" << RESET << std::endl;
+    std::cout << " 1. Addition (+)         2. Subtraction (-)      3. Multiplication (*)\n";
+    std::cout << " 4. Division (/)         5. Modulus (%)          6. Absolute Value\n";
+
+    std::cout << BLUE << "\n┌─── Trigonometric Functions ───┐" << RESET << std::endl;
+    std::cout << " 7. sin()                8. cos()                9. tan()\n";
+    std::cout << "10. arcsin()            11. arccos()            12. arctan()\n";
+    std::cout << "13. sinh()              14. cosh()              15. tanh()\n";
+
+    std::cout << BLUE << "\n┌─── Exponential & Logarithmic ───┐" << RESET << std::endl;
+    std::cout << "16. Power (x^y)         17. e^x                 18. ln(x)\n";
+    std::cout << "19. log10(x)            20. log2(x)\n";
+
+    std::cout << BLUE << "\n┌─── Root Functions ───┐" << RESET << std::endl;
+    std::cout << "21. Square Root         22. Cube Root           23. nth Root\n";
+
+    std::cout << BLUE << "\n┌─── Advanced Functions ───┐" << RESET << std::endl;
+    std::cout << "24. Factorial (n!)      25. Ceiling             26. Floor\n";
+    std::cout << "27. Round               28. Statistics          \n";
+
+    std::cout << BLUE << "\n┌─── Conversions ───┐" << RESET << std::endl;
+    std::cout << "29. Degrees to Radians  30. Radians to Degrees\n";
+
+    std::cout << RED << "\n 0. Exit Calculator\n"
+              << RESET << std::endl;
+}
+
+int main()
+{
+    double a, b, result;
+    int choice;
+    char continueCalc;
+
+    std::cout << std::fixed << std::setprecision(6);
+
+    do
+    {
+        displayMenu();
+        choice = getValidChoice(0, 30);
+
+        if (choice == 0)
+        {
+            std::cout << GREEN << "\n╔═══════════════════════════════════════╗\n";
+            std::cout << "║  Thank you for using the calculator!  ║\n";
+            std::cout << "╚═══════════════════════════════════════╝\n"
+                      << RESET;
+            break;
         }
 
-        switch (choice) {
-            case 1: std::cout << "Enter your 1st number:\t"; std::cin >> a;
-                    std::cout << "Enter your 2nd number:\t"; std::cin >> b;
-                    answer = add(a, b); break;
+        bool validOperation = true;
 
-            case 2: std::cout << "Enter your 1st number:\t"; std::cin >> a;
-                    std::cout << "Enter your 2nd number:\t"; std::cin >> b;
-                    answer = subtract(a, b); break;
+        switch (choice)
+        {
+        // Basic operations
+        case 1:
+            a = getValidNumber("Enter first number: ");
+            b = getValidNumber("Enter second number: ");
+            result = add(a, b);
+            break;
+        case 2:
+            a = getValidNumber("Enter first number: ");
+            b = getValidNumber("Enter second number: ");
+            result = subtract(a, b);
+            break;
+        case 3:
+            a = getValidNumber("Enter first number: ");
+            b = getValidNumber("Enter second number: ");
+            result = multiply(a, b);
+            break;
+        case 4:
+            a = getValidNumber("Enter dividend: ");
+            b = getValidNumber("Enter divisor: ");
+            result = divide(a, b);
+            break;
+        case 5:
+            a = getValidNumber("Enter first number: ");
+            b = getValidNumber("Enter second number: ");
+            result = modulus(a, b);
+            break;
+        case 6:
+            result = absoluteValue();
+            break;
 
-            case 3: std::cout << "Enter your 1st number:\t"; std::cin >> a;
-                    std::cout << "Enter your 2nd number:\t"; std::cin >> b;
-                    answer = multiply(a, b); break;
+        // Trigonometric functions
+        case 7:
+            result = sine();
+            break;
+        case 8:
+            result = cosine();
+            break;
+        case 9:
+            result = tangent();
+            break;
+        case 10:
+            result = arcsine();
+            break;
+        case 11:
+            result = arccosine();
+            break;
+        case 12:
+            result = arctangent();
+            break;
+        case 13:
+            result = hyperbolicSine();
+            break;
+        case 14:
+            result = hyperbolicCosine();
+            break;
+        case 15:
+            result = hyperbolicTangent();
+            break;
 
-            case 4: std::cout << "Enter your 1st number:\t"; std::cin >> a;
-                    std::cout << "Enter your 2nd number:\t"; std::cin >> b;
-                    answer = divide(a, b); break;
+        // Exponential and logarithmic
+        case 16:
+            result = power();
+            break;
+        case 17:
+            result = exponential();
+            break;
+        case 18:
+            result = naturalLog();
+            break;
+        case 19:
+            result = log10();
+            break;
+        case 20:
+            result = log2();
+            break;
 
-            case 5: answer = sin(); break;
-            case 6: answer = cos(); break;
-            case 7: answer = tan(); break;
-            case 8: answer = negsin(); break;
-            case 9: answer = negcos(); break;
-            case 10: answer = negtan(); break;
-            case 11: answer = expo(); break;
-            case 12: answer = power(); break;
-            case 13: answer = logarithm(); break;
-            case 14: answer = logarithm10(); break;
-            case 15: answer = square_root(); break;
-            case 16: answer = cube_root(); break;
+        // Roots
+        case 21:
+            result = squareRoot();
+            break;
+        case 22:
+            result = cubeRoot();
+            break;
+        case 23:
+            result = nthRoot();
+            break;
 
-            default: return 0;
+        // Advanced functions
+        case 24:
+            result = factorial();
+            break;
+        case 25:
+            result = ceiling();
+            break;
+        case 26:
+            result = floor();
+            break;
+        case 27:
+            result = roundNum();
+            break;
+        case 28:
+            statistics();
+            validOperation = false;
+            break;
+
+        // Conversions
+        case 29:
+            result = degreeToRadian();
+            break;
+        case 30:
+            result = radianToDegree();
+            break;
+
+        default:
+            validOperation = false;
+            break;
         }
 
-        // Displaying answer
-        std::cout << "Result: " << answer << std::endl;
-        std::cout << "Do you want to continue? (y/n): ";
-        std::cin >> user;
-       
+        if (validOperation && choice != 28)
+        {
+            std::cout << GREEN << "\n┌─────────────────────┐\n";
+            std::cout << "│ Result: " << BOLD << result << RESET << GREEN << "\n";
+            std::cout << "└─────────────────────┘\n"
+                      << RESET;
+        }
 
-    } while (user == 'y' || user == 'Y');
+        std::cout << YELLOW << "\nDo you want to perform another calculation? (y/n): " << RESET;
+        std::cin >> continueCalc;
+        clearInput();
 
-    std::cout << "Exiting Calculator......";
-   
+    } while (continueCalc == 'y' || continueCalc == 'Y');
+
+    return 0;
 }
