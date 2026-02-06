@@ -1,0 +1,1664 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Scientific Calculator - Complete Guide</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0e17;
+            --bg-secondary: #141925;
+            --bg-tertiary: #1a202e;
+            --accent-primary: #00d4ff;
+            --accent-secondary: #7c3aed;
+            --accent-glow: #00d4ff33;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-subtle: #2d3748;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --code-bg: #0f1419;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* Animated gradient background */
+        .hero-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: -1;
+            background: linear-gradient(135deg, #0a0e17 0%, #1a202e 50%, #141925 100%);
+        }
+
+        .hero-bg::before {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+            top: -200px;
+            right: -200px;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .hero-bg::after {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(124, 58, 237, 0.2) 0%, transparent 70%);
+            bottom: -100px;
+            left: -100px;
+            animation: float 25s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            33% {
+                transform: translate(50px, -50px) scale(1.1);
+            }
+
+            66% {
+                transform: translate(-30px, 30px) scale(0.9);
+            }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        header {
+            padding: 3rem 0 6rem;
+            text-align: center;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 4rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .tagline {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            animation: fadeInUp 1s ease-out 0.3s both;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+            animation: fadeInUp 1s ease-out 0.6s both;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 0.5rem;
+        }
+
+        /* Navigation */
+        nav {
+            position: sticky;
+            top: 0;
+            background: rgba(10, 14, 23, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border-subtle);
+            margin-bottom: 4rem;
+        }
+
+        nav ul {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            list-style: none;
+            flex-wrap: wrap;
+        }
+
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 0.5rem 1rem;
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: var(--accent-primary);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        nav a:hover {
+            color: var(--accent-primary);
+        }
+
+        nav a:hover::after {
+            width: 80%;
+        }
+
+        /* Section Styling */
+        section {
+            margin-bottom: 6rem;
+            animation: fadeIn 1s ease-out;
+        }
+
+        h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 60%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-primary), transparent);
+        }
+
+        h3 {
+            font-size: 1.8rem;
+            color: var(--accent-primary);
+            margin: 2rem 0 1rem;
+            font-weight: 700;
+        }
+
+        h4 {
+            font-size: 1.3rem;
+            color: var(--text-primary);
+            margin: 1.5rem 0 1rem;
+            font-weight: 600;
+        }
+
+        /* Cards */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-primary);
+            box-shadow: 0 10px 40px var(--accent-glow);
+        }
+
+        .card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .card h4 {
+            margin-top: 0;
+            color: var(--accent-primary);
+        }
+
+        .card p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Code Blocks */
+        .code-container {
+            background: var(--code-bg);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin: 2rem 0;
+            overflow: hidden;
+        }
+
+        .code-header {
+            background: var(--bg-tertiary);
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .code-title {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent-primary);
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .code-lang {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        pre {
+            margin: 0;
+            padding: 1.5rem;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-primary);
+        }
+
+        .inline-code {
+            background: var(--bg-tertiary);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85em;
+            color: var(--accent-primary);
+        }
+
+        /* Syntax Highlighting */
+        .keyword {
+            color: #c792ea;
+        }
+
+        .function {
+            color: #82aaff;
+        }
+
+        .string {
+            color: #c3e88d;
+        }
+
+        .comment {
+            color: #546e7a;
+            font-style: italic;
+        }
+
+        .number {
+            color: #f78c6c;
+        }
+
+        .operator {
+            color: #89ddff;
+        }
+
+        .type {
+            color: #ffcb6b;
+        }
+
+        /* Feature List */
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .feature-item {
+            background: var(--bg-secondary);
+            padding: 1rem 1.5rem;
+            border-left: 3px solid var(--accent-primary);
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .feature-item:hover {
+            background: var(--bg-tertiary);
+            transform: translateX(5px);
+        }
+
+        .feature-item strong {
+            color: var(--accent-primary);
+        }
+
+        /* Step Cards */
+        .steps {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .step {
+            display: flex;
+            gap: 2rem;
+            align-items: flex-start;
+        }
+
+        .step-number {
+            flex-shrink: 0;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            box-shadow: 0 4px 20px var(--accent-glow);
+        }
+
+        .step-content {
+            flex: 1;
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .step-content h4 {
+            margin-top: 0;
+            color: var(--accent-primary);
+        }
+
+        /* Table */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .comparison-table th {
+            background: var(--bg-tertiary);
+            padding: 1rem;
+            text-align: left;
+            color: var(--accent-primary);
+            font-weight: 700;
+            border-bottom: 2px solid var(--border-subtle);
+        }
+
+        .comparison-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .comparison-table tr:hover {
+            background: var(--bg-tertiary);
+        }
+
+        /* Callout Boxes */
+        .callout {
+            background: var(--bg-secondary);
+            border-left: 4px solid var(--accent-primary);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 8px;
+        }
+
+        .callout.warning {
+            border-left-color: var(--warning);
+        }
+
+        .callout.success {
+            border-left-color: var(--success);
+        }
+
+        .callout.error {
+            border-left-color: var(--error);
+        }
+
+        .callout-title {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Footer */
+        footer {
+            background: var(--bg-tertiary);
+            border-top: 1px solid var(--border-subtle);
+            padding: 3rem 0;
+            text-align: center;
+            margin-top: 6rem;
+        }
+
+        footer p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .footer-heart {
+            color: var(--error);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.2);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 2.5rem;
+            }
+
+            .tagline {
+                font-size: 1.2rem;
+            }
+
+            h2 {
+                font-size: 2rem;
+            }
+
+            .hero-stats {
+                gap: 1.5rem;
+            }
+
+            .stat-number {
+                font-size: 2rem;
+            }
+
+            nav ul {
+                gap: 1rem;
+            }
+
+            .step {
+                flex-direction: column;
+            }
+
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Scroll reveal */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Contribution section special styling */
+        .contribute-banner {
+            background: linear-gradient(135deg, var(--accent-secondary), var(--accent-primary));
+            padding: 3rem;
+            border-radius: 16px;
+            text-align: center;
+            margin: 3rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .contribute-banner::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .contribute-banner h3 {
+            color: white;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .contribute-banner p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.2rem;
+            position: relative;
+            z-index: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="hero-bg"></div>
+
+    <div class="container">
+        <header>
+            <h1 class="logo">🧮 Ultimate Scientific Calculator</h1>
+            <p class="tagline">A Comprehensive Guide to Building Mathematical Excellence</p>
+            <div class="hero-stats">
+                <div class="stat">
+                    <div class="stat-number">44+</div>
+                    <div class="stat-label">Operations</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">1300+</div>
+                    <div class="stat-label">Lines of Code</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">∞</div>
+                    <div class="stat-label">Possibilities</div>
+                </div>
+            </div>
+        </header>
+
+        <nav>
+            <ul>
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#components">Components</a></li>
+                <li><a href="#examples">Code Examples</a></li>
+                <li><a href="#algorithms">Algorithms</a></li>
+                <li><a href="#setup">Setup Guide</a></li>
+                <li><a href="#contribute">Contribute</a></li>
+            </ul>
+        </nav>
+
+        <!-- OVERVIEW SECTION -->
+        <section id="overview" class="reveal">
+            <h2>📚 Project Overview</h2>
+            <p style="color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 2rem;">
+                The Ultimate Scientific Calculator is a command-line masterpiece built with C++11.
+                It combines mathematical precision with beautiful terminal aesthetics, offering everything
+                from basic arithmetic to complex number operations, matrix calculations, and expression parsing.
+            </p>
+
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon">🎯</div>
+                    <h4>Core Philosophy</h4>
+                    <p>Built on principles of robustness, user-friendliness, and mathematical accuracy. Every operation
+                        is validated, every input is checked, and every result is precise.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🎨</div>
+                    <h4>Visual Excellence</h4>
+                    <p>Three customizable themes (Dark, Light, Monochrome) with ANSI color codes, Unicode box-drawing
+                        characters, and professional formatting.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🧠</div>
+                    <h4>Smart Features</h4>
+                    <p>Memory operations, calculation history (up to 50 entries), expression parsing with proper
+                        precedence, and file export capabilities.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">⚡</div>
+                    <h4>Performance</h4>
+                    <p>Optimized algorithms including Euclidean GCD, Shunting Yard parser, and efficient matrix
+                        operations. Handles complex calculations instantly.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- COMPONENTS SECTION -->
+        <section id="components" class="reveal">
+            <h2>🔧 Key Components Explained</h2>
+
+            <h3>1. Color Theme System</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                The calculator uses an enum-based theme system with dedicated color structures for each theme. This
+                allows seamless switching between visual styles.
+            </p>
+
+            <div class="code-container">
+                <div class="code-header">
+                    <span class="code-title">Theme System Implementation</span>
+                    <span class="code-lang">C++</span>
+                </div>
+                <pre><code><span class="comment">// Define available themes as enum</span>
+<span class="keyword">enum</span> <span class="type">ColorTheme</span> { DARK, LIGHT, MONOCHROME };
+<span class="type">ColorTheme</span> currentTheme = DARK;
+
+<span class="comment">// Structure to hold theme colors</span>
+<span class="keyword">struct</span> <span class="type">ThemeColors</span> {
+    std::string reset;      <span class="comment">// Reset to default</span>
+    std::string bold;       <span class="comment">// Bold text</span>
+    std::string primary;    <span class="comment">// Main accent color</span>
+    std::string secondary;  <span class="comment">// Secondary accent</span>
+    std::string success;    <span class="comment">// Success messages</span>
+    std::string warning;    <span class="comment">// Warning messages</span>
+    std::string error;      <span class="comment">// Error messages</span>
+    std::string accent;     <span class="comment">// Special highlights</span>
+};
+
+<span class="comment">// Example: Dark theme with ANSI color codes</span>
+<span class="type">ThemeColors</span> darkTheme = {
+    <span class="string">"\033[0m"</span>,  <span class="comment">// reset</span>
+    <span class="string">"\033[1m"</span>,  <span class="comment">// bold</span>
+    <span class="string">"\033[36m"</span>, <span class="comment">// cyan - primary</span>
+    <span class="string">"\033[34m"</span>, <span class="comment">// blue - secondary</span>
+    <span class="string">"\033[32m"</span>, <span class="comment">// green - success</span>
+    <span class="string">"\033[33m"</span>, <span class="comment">// yellow - warning</span>
+    <span class="string">"\033[31m"</span>, <span class="comment">// red - error</span>
+    <span class="string">"\033[35m"</span>  <span class="comment">// magenta - accent</span>
+};
+
+<span class="comment">// Pointer to current theme for easy switching</span>
+<span class="type">ThemeColors</span> *theme = &darkTheme;</code></pre>
+            </div>
+
+            <div class="callout success">
+                <div class="callout-title">💡 Why This Matters</div>
+                <p>Using a pointer to the current theme allows instant theme switching without refactoring code. Change
+                    <span class="inline-code">theme</span> pointer, and all output colors update automatically!
+                </p>
+            </div>
+
+            <h3>2. Input Validation System</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                Robust input validation ensures the calculator never crashes from bad input. It uses a multi-layer
+                approach.
+            </p>
+
+            <div class="code-container">
+                <div class="code-header">
+                    <span class="code-title">Input Validation Functions</span>
+                    <span class="code-lang">C++</span>
+                </div>
+                <pre><code><span class="comment">// Clears any error state from cin</span>
+<span class="keyword">void</span> <span class="function">clearInput</span>() {
+    std::cin.<span class="function">clear</span>();
+    std::cin.<span class="function">ignore</span>(std::numeric_limits&lt;std::streamsize&gt;::max(), <span class="string">'\n'</span>);
+}
+
+<span class="comment">// Gets a valid number with infinite retry</span>
+<span class="keyword">double</span> <span class="function">getValidNumber</span>(<span class="keyword">const</span> std::string &prompt) {
+    <span class="keyword">double</span> num;
+    <span class="keyword">while</span> (<span class="keyword">true</span>) {
+        std::cout &lt;&lt; prompt;
+        <span class="keyword">if</span> (std::cin &gt;&gt; num) {
+            <span class="keyword">return</span> num;  <span class="comment">// Success!</span>
+        }
+        <span class="comment">// If input failed, show error and retry</span>
+        std::cout &lt;&lt; theme-&gt;error 
+                  &lt;&lt; <span class="string">"Invalid input! Please enter a valid number."</span> 
+                  &lt;&lt; theme-&gt;reset &lt;&lt; std::endl;
+        <span class="function">clearInput</span>();
+    }
+}
+
+<span class="comment">// Gets a valid menu choice within range</span>
+<span class="keyword">int</span> <span class="function">getValidChoice</span>(<span class="keyword">int</span> min, <span class="keyword">int</span> max) {
+    <span class="keyword">int</span> choice;
+    <span class="keyword">while</span> (<span class="keyword">true</span>) {
+        std::cout &lt;&lt; theme-&gt;warning &lt;&lt; <span class="string">"Enter your choice ("</span> 
+                  &lt;&lt; min &lt;&lt; <span class="string">"-"</span> &lt;&lt; max &lt;&lt; <span class="string">"): "</span> 
+                  &lt;&lt; theme-&gt;reset;
+        <span class="keyword">if</span> (std::cin &gt;&gt; choice && choice &gt;= min && choice &lt;= max) {
+            <span class="keyword">return</span> choice;
+        }
+        std::cout &lt;&lt; theme-&gt;error 
+                  &lt;&lt; <span class="string">"Invalid choice! Please enter a number between "</span>
+                  &lt;&lt; min &lt;&lt; <span class="string">" and "</span> &lt;&lt; max &lt;&lt; <span class="string">"."</span> 
+                  &lt;&lt; theme-&gt;reset &lt;&lt; std::endl;
+        <span class="function">clearInput</span>();
+    }
+}</code></pre>
+            </div>
+
+            <h3>3. Memory & History System</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                Like a real calculator, this supports memory storage and maintains a history of calculations.
+            </p>
+
+            <div class="code-container">
+                <div class="code-header">
+                    <span class="code-title">Memory & History Management</span>
+                    <span class="code-lang">C++</span>
+                </div>
+                <pre><code><span class="comment">// Global state for memory and history</span>
+std::vector&lt;<span class="keyword">double</span>&gt; history;
+std::vector&lt;std::string&gt; historyLabels;
+<span class="keyword">double</span> memory = <span class="number">0.0</span>;
+<span class="keyword">const int</span> MAX_HISTORY = <span class="number">50</span>;
+
+<span class="comment">// Add calculation to history (FIFO with limit)</span>
+<span class="keyword">void</span> <span class="function">addToHistory</span>(<span class="keyword">double</span> value, <span class="keyword">const</span> std::string &label = <span class="string">""</span>) {
+    history.<span class="function">push_back</span>(value);
+    historyLabels.<span class="function">push_back</span>(label);
+    
+    <span class="comment">// Keep only last 50 entries</span>
+    <span class="keyword">if</span> (history.<span class="function">size</span>() &gt; MAX_HISTORY) {
+        history.<span class="function">erase</span>(history.<span class="function">begin</span>());
+        historyLabels.<span class="function">erase</span>(historyLabels.<span class="function">begin</span>());
+    }
+}
+
+<span class="comment">// Memory operations (MS, MR, MC, M+)</span>
+<span class="keyword">void</span> <span class="function">memoryStore</span>(<span class="keyword">double</span> value) {
+    memory = value;
+    std::cout &lt;&lt; theme-&gt;success 
+              &lt;&lt; <span class="string">"Value "</span> &lt;&lt; value &lt;&lt; <span class="string">" stored in memory."</span> 
+              &lt;&lt; theme-&gt;reset &lt;&lt; std::endl;
+}
+
+<span class="keyword">void</span> <span class="function">memoryRecall</span>() {
+    std::cout &lt;&lt; theme-&gt;success 
+              &lt;&lt; <span class="string">"Memory: "</span> &lt;&lt; memory 
+              &lt;&lt; theme-&gt;reset &lt;&lt; std::endl;
+}
+
+<span class="keyword">void</span> <span class="function">memoryAdd</span>(<span class="keyword">double</span> value) {
+    memory += value;
+    std::cout &lt;&lt; theme-&gt;success 
+              &lt;&lt; <span class="string">"Added to memory. New value: "</span> &lt;&lt; memory 
+              &lt;&lt; theme-&gt;reset &lt;&lt; std::endl;
+}</code></pre>
+            </div>
+
+            <h3>4. Expression Parser (Shunting Yard Algorithm)</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                The crown jewel: an expression parser that handles complex mathematical expressions with proper operator
+                precedence and parentheses.
+            </p>
+
+            <div class="code-container">
+                <div class="code-header">
+                    <span class="code-title">Expression Evaluation Engine</span>
+                    <span class="code-lang">C++</span>
+                </div>
+                <pre><code><span class="comment">// Operator precedence levels (higher = evaluated first)</span>
+<span class="keyword">int</span> <span class="function">getPrecedence</span>(<span class="keyword">char</span> op) {
+    <span class="keyword">if</span> (op == <span class="string">'+'</span> || op == <span class="string">'-'</span>) <span class="keyword">return</span> <span class="number">1</span>;
+    <span class="keyword">if</span> (op == <span class="string">'*'</span> || op == <span class="string">'/'</span>) <span class="keyword">return</span> <span class="number">2</span>;
+    <span class="keyword">if</span> (op == <span class="string">'^'</span>) <span class="keyword">return</span> <span class="number">3</span>;
+    <span class="keyword">return</span> <span class="number">0</span>;
+}
+
+<span class="comment">// Apply binary operation</span>
+<span class="keyword">double</span> <span class="function">applyOperation</span>(<span class="keyword">double</span> a, <span class="keyword">double</span> b, <span class="keyword">char</span> op) {
+    <span class="keyword">switch</span> (op) {
+        <span class="keyword">case</span> <span class="string">'+'</span>: <span class="keyword">return</span> a + b;
+        <span class="keyword">case</span> <span class="string">'-'</span>: <span class="keyword">return</span> a - b;
+        <span class="keyword">case</span> <span class="string">'*'</span>: <span class="keyword">return</span> a * b;
+        <span class="keyword">case</span> <span class="string">'/'</span>:
+            <span class="keyword">if</span> (b == <span class="number">0</span>) <span class="keyword">throw</span> std::runtime_error(<span class="string">"Division by zero"</span>);
+            <span class="keyword">return</span> a / b;
+        <span class="keyword">case</span> <span class="string">'^'</span>: <span class="keyword">return</span> std::<span class="function">pow</span>(a, b);
+        <span class="keyword">default</span>: <span class="keyword">return</span> <span class="number">0</span>;
+    }
+}
+
+<span class="comment">// Main expression evaluator using two-stack algorithm</span>
+<span class="keyword">double</span> <span class="function">evaluateExpression</span>(<span class="keyword">const</span> std::string &expr) {
+    std::stack&lt;<span class="keyword">double</span>&gt; values;  <span class="comment">// Stack for numbers</span>
+    std::stack&lt;<span class="keyword">char</span>&gt; ops;      <span class="comment">// Stack for operators</span>
+    
+    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; expr.<span class="function">length</span>(); i++) {
+        <span class="comment">// Skip whitespace</span>
+        <span class="keyword">if</span> (<span class="function">isspace</span>(expr[i])) <span class="keyword">continue</span>;
+        
+        <span class="comment">// Parse numbers (including decimals)</span>
+        <span class="keyword">if</span> (<span class="function">isdigit</span>(expr[i]) || expr[i] == <span class="string">'.'</span>) {
+            std::string numStr;
+            <span class="keyword">while</span> (i &lt; expr.<span class="function">length</span>() && 
+                   (<span class="function">isdigit</span>(expr[i]) || expr[i] == <span class="string">'.'</span>)) {
+                numStr += expr[i++];
+            }
+            i--;
+            values.<span class="function">push</span>(std::<span class="function">stod</span>(numStr));
+        }
+        <span class="comment">// Handle opening parenthesis</span>
+        <span class="keyword">else if</span> (expr[i] == <span class="string">'('</span>) {
+            ops.<span class="function">push</span>(expr[i]);
+        }
+        <span class="comment">// Handle closing parenthesis</span>
+        <span class="keyword">else if</span> (expr[i] == <span class="string">')'</span>) {
+            <span class="keyword">while</span> (!ops.<span class="function">empty</span>() && ops.<span class="function">top</span>() != <span class="string">'('</span>) {
+                <span class="keyword">double</span> b = values.<span class="function">top</span>(); values.<span class="function">pop</span>();
+                <span class="keyword">double</span> a = values.<span class="function">top</span>(); values.<span class="function">pop</span>();
+                <span class="keyword">char</span> op = ops.<span class="function">top</span>(); ops.<span class="function">pop</span>();
+                values.<span class="function">push</span>(<span class="function">applyOperation</span>(a, b, op));
+            }
+            <span class="keyword">if</span> (!ops.<span class="function">empty</span>()) ops.<span class="function">pop</span>(); <span class="comment">// Remove '('</span>
+        }
+        <span class="comment">// Handle operators</span>
+        <span class="keyword">else if</span> (expr[i] == <span class="string">'+'</span> || expr[i] == <span class="string">'-'</span> || 
+                 expr[i] == <span class="string">'*'</span> || expr[i] == <span class="string">'/'</span> || expr[i] == <span class="string">'^'</span>) {
+            <span class="comment">// Process operators with higher/equal precedence</span>
+            <span class="keyword">while</span> (!ops.<span class="function">empty</span>() && 
+                   <span class="function">getPrecedence</span>(ops.<span class="function">top</span>()) &gt;= <span class="function">getPrecedence</span>(expr[i])) {
+                <span class="keyword">double</span> b = values.<span class="function">top</span>(); values.<span class="function">pop</span>();
+                <span class="keyword">double</span> a = values.<span class="function">top</span>(); values.<span class="function">pop</span>();
+                <span class="keyword">char</span> op = ops.<span class="function">top</span>(); ops.<span class="function">pop</span>();
+                values.<span class="function">push</span>(<span class="function">applyOperation</span>(a, b, op));
+            }
+            ops.<span class="function">push</span>(expr[i]);
+        }
+    }
+    
+    <span class="comment">// Process remaining operators</span>
+    <span class="keyword">while</span> (!ops.<span class="function">empty</span>()) {
+        <span class="keyword">double</span> b = values.<span class="function">top</span>(); values.<span class="function">pop</span>();
+        <span class="keyword">double</span> a = values.<span class="function">top</span>(); values.<span class="function">pop</span>();
+        <span class="keyword">char</span> op = ops.<span class="function">top</span>(); ops.<span class="function">pop</span>();
+        values.<span class="function">push</span>(<span class="function">applyOperation</span>(a, b, op));
+    }
+    
+    <span class="keyword">return</span> values.<span class="function">top</span>();
+}</code></pre>
+            </div>
+
+            <div class="callout">
+                <div class="callout-title">🎯 How It Works</div>
+                <p><strong>Input:</strong> <span class="inline-code">(3 + 5) * 2^3 - 10</span></p>
+                <p><strong>Step 1:</strong> Parse <span class="inline-code">(3 + 5)</span> → Push 3, push +, push 5,
+                    evaluate → 8</p>
+                <p><strong>Step 2:</strong> See *, push to operator stack</p>
+                <p><strong>Step 3:</strong> Parse <span class="inline-code">2^3</span> → Push 2, push ^, push 3,
+                    evaluate → 8</p>
+                <p><strong>Step 4:</strong> Apply multiplication: 8 * 8 = 64</p>
+                <p><strong>Step 5:</strong> Subtract 10 → <strong>Result: 54</strong></p>
+            </div>
+        </section>
+
+        <!-- CODE EXAMPLES SECTION -->
+        <section id="examples" class="reveal">
+            <h2>💻 Practical Code Examples</h2>
+
+            <h3>Example 1: Basic Arithmetic Functions</h3>
+            <div class="code-container">
+                <div class="code-header">
+                    <span class="code-title">Basic Operations Implementation</span>
+                    <span class="code-lang">C++</span>
+                </div>
+                <pre><code><span class="comment">// Simple yet effective: clear naming and error handling</span>
+<span class="keyword">double</span> <span class="function">add</span>(<span class="keyword">double</span> a, <span class="keyword">double</span> b) {
+    <span class="keyword">return</span> a + b;
+}
+
+<span class="keyword">double</span> <span class="function">divide</span>(<span class="keyword">double</span> a, <span class="keyword">double</span> b) {
+    <span class="keyword">if</span> (b == <span class="number">0</span>) {
+        std::cout &lt;&lt; theme-&gt;error 
+                  &lt;&lt; <span class="string">"Error: Division by zero!"</span> 
+                  &lt;&lt; theme-&gt;reset &lt;&lt; std::endl;
+        <span class="keyword">return</span> <span class="number">0</span>;
+    }
+    <span class="keyword">return</span> a / b;
+}
+
+<span class="comment">// Usage in main loop</span>
+<span class="keyword">case</span> <span class="number">1</span>:
+    a = <span class="function">getValidNumber</span>(<span class="string">"Enter first number: "</span>);
+    b = <span class="function">getValidNumber</span>(<span class="string">"Enter second number: "</span>);
+    result = <span class="function">add</span>(a, b);
+    <span class="keyword">break</span>;</code></pre>
+            </div>
+
+            <h3>Example 2: Matrix Operations</h3>
+            <div class="code-container">
+                <div class="code-header">
+                    <span class="code-title">Matrix Multiplication Algorithm</span>
+                    <span class="code-lang">C++</span>
+                </div>
+                <pre><code><span class="keyword">void</span> <span class="function">matrixMultiplication</span>() {
+    <span class="keyword">int</span> r1, c1, r2, c2;
+    
+    <span class="comment">// Get dimensions for Matrix A</span>
+    std::cout &lt;&lt; <span class="string">"Matrix A - Rows: "</span>;
+    std::cin &gt;&gt; r1;
+    std::cout &lt;&lt; <span class="string">"Matrix A - Columns: "</span>;
+    std::cin &gt;&gt; c1;
+    
+    <span class="comment">// Get dimensions for Matrix B</span>
+    std::cout &lt;&lt; <span class="string">"Matrix B - Rows: "</span>;
+    std::cin &gt;&gt; r2;
+    std::cout &lt;&lt; <span class="string">"Matrix B - Columns: "</span>;
+    std::cin &gt;&gt; c2;
+    
+    <span class="comment">// Validate: A columns must equal B rows</span>
+    <span class="keyword">if</span> (c1 != r2) {
+        std::cout &lt;&lt; theme-&gt;error 
+                  &lt;&lt; <span class="string">"Error: Cannot multiply! A columns must equal B rows."</span>
+                  &lt;&lt; theme-&gt;reset &lt;&lt; std::endl;
+        <span class="keyword">return</span>;
+    }
+    
+    <span class="comment">// Initialize matrices</span>
+    std::vector&lt;std::vector&lt;<span class="keyword">double</span>&gt;&gt; A(r1, std::vector&lt;<span class="keyword">double</span>&gt;(c1));
+    std::vector&lt;std::vector&lt;<span class="keyword">double</span>&gt;&gt; B(r2, std::vector&lt;<span class="keyword">double</span>&gt;(c2));
+    std::vector&lt;std::vector&lt;<span class="keyword">double</span>&gt;&gt; result(r1, std::vector&lt;<span class="keyword">double</span>&gt;(c2, <span class="number">0</span>));
+    
+    <span class="comment">// Input Matrix A</span>
+    std::cout &lt;&lt; <span class="string">"Enter elements for Matrix A:\n"</span>;
+    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; r1; i++)
+        <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; c1; j++)
+            std::cin &gt;&gt; A[i][j];
+    
+    <span class="comment">// Input Matrix B</span>
+    std::cout &lt;&lt; <span class="string">"Enter elements for Matrix B:\n"</span>;
+    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; r2; i++)
+        <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; c2; j++)
+            std::cin &gt;&gt; B[i][j];
+    
+    <span class="comment">// Perform multiplication: C[i][j] = Σ(A[i][k] * B[k][j])</span>
+    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; r1; i++) {
+        <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; c2; j++) {
+            <span class="keyword">for</span> (<span class="keyword">int</span> k = <span class="number">0</span>; k &lt; c1; k++) {
+                result[i][j] += A[i][k] * B[k][j];
+            }
+        }
+    }
+    
+    <span class="comment">// Display result</span>
+    std::cout &lt;&lt; theme-&gt;success &lt;&lt; <span class="string">"\nResult Matrix:\n"</span>;
+    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; r1; i++) {
+        <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; c2; j++) {
+            std::cout &lt;&lt; std::<span class="function">setw</span>(<span class="number">8</span>) &lt;&lt; result[i][j] &lt;&lt; <span class="string">" "</span>;
+        }
+        std::cout &lt;&lt; <span class="string">"\n"</span>;
+    }
+    std::cout &lt;&lt; theme-&gt;reset;
+}</code></pre>
+            </div>
+
+            <h3>Example 3: Complex Number Operations</h3>
+            <div class="code-container">
+                <div class="code-header">
+                    <span class="code-title">Complex Number System</span>
+                    <span class="code-lang">C++</span>
+                </div>
+                <pre><code><span class="comment">// Uses C++ standard library complex type</span>
+<span class="keyword">void</span> <span class="function">complexNumberMenu</span>() {
+    std::complex&lt;<span class="keyword">double</span>&gt; c1, c2, result;
+    <span class="keyword">double</span> real, imag;
+    
+    <span class="comment">// Get first complex number</span>
+    std::cout &lt;&lt; <span class="string">"Enter first complex number:\n"</span>;
+    std::cout &lt;&lt; <span class="string">"Real part: "</span>; std::cin &gt;&gt; real;
+    std::cout &lt;&lt; <span class="string">"Imaginary part: "</span>; std::cin &gt;&gt; imag;
+    c1 = std::complex&lt;<span class="keyword">double</span>&gt;(real, imag);
+    
+    <span class="comment">// Get second complex number</span>
+    std::cout &lt;&lt; <span class="string">"Enter second complex number:\n"</span>;
+    std::cout &lt;&lt; <span class="string">"Real part: "</span>; std::cin &gt;&gt; real;
+    std::cout &lt;&lt; <span class="string">"Imaginary part: "</span>; std::cin &gt;&gt; imag;
+    c2 = std::complex&lt;<span class="keyword">double</span>&gt;(real, imag);
+    
+    <span class="comment">// Menu for operations</span>
+    std::cout &lt;&lt; <span class="string">"\n1. Addition\n2. Subtraction\n3. Multiplication\n4. Division\n"</span>;
+    <span class="keyword">int</span> choice = <span class="function">getValidChoice</span>(<span class="number">1</span>, <span class="number">4</span>);
+    
+    <span class="keyword">switch</span> (choice) {
+        <span class="keyword">case</span> <span class="number">1</span>: result = c1 + c2; <span class="keyword">break</span>;
+        <span class="keyword">case</span> <span class="number">2</span>: result = c1 - c2; <span class="keyword">break</span>;
+        <span class="keyword">case</span> <span class="number">3</span>: result = c1 * c2; <span class="keyword">break</span>;
+        <span class="keyword">case</span> <span class="number">4</span>: result = c1 / c2; <span class="keyword">break</span>;
+    }
+    
+    <span class="comment">// Display result with magnitude and phase</span>
+    std::cout &lt;&lt; theme-&gt;success;
+    std::cout &lt;&lt; <span class="string">"Result: ("</span> &lt;&lt; result.<span class="function">real</span>() 
+              &lt;&lt; <span class="string">" + "</span> &lt;&lt; result.<span class="function">imag</span>() &lt;&lt; <span class="string">"i)\n"</span>;
+    std::cout &lt;&lt; <span class="string">"Magnitude: "</span> &lt;&lt; std::<span class="function">abs</span>(result) &lt;&lt; <span class="string">"\n"</span>;
+    std::cout &lt;&lt; <span class="string">"Phase: "</span> &lt;&lt; std::<span class="function">arg</span>(result) &lt;&lt; <span class="string">" radians\n"</span>;
+    std::cout &lt;&lt; theme-&gt;reset;
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- ALGORITHMS SECTION -->
+        <section id="algorithms" class="reveal">
+            <h2>🧮 Key Algorithms Implemented</h2>
+
+            <div class="card-grid">
+                <div class="card">
+                    <h4>Euclidean Algorithm (GCD)</h4>
+                    <p><strong>Purpose:</strong> Find greatest common divisor efficiently</p>
+                    <p><strong>Complexity:</strong> O(log min(a,b))</p>
+                    <p><strong>Method:</strong> Recursive remainder calculation until remainder is 0</p>
+                    <pre
+                        style="background: var(--code-bg); padding: 1rem; border-radius: 6px; margin-top: 1rem; font-size: 0.85rem;"><code><span class="keyword">int</span> <span class="function">gcd</span>(<span class="keyword">int</span> a, <span class="keyword">int</span> b) {
+    <span class="keyword">if</span> (b == <span class="number">0</span>) <span class="keyword">return</span> a;
+    <span class="keyword">return</span> <span class="function">gcd</span>(b, a % b);
+}</code></pre>
+                </div>
+
+                <div class="card">
+                    <h4>Shunting Yard (Expression Parser)</h4>
+                    <p><strong>Purpose:</strong> Convert infix notation to evaluable form</p>
+                    <p><strong>Complexity:</strong> O(n) where n is expression length</p>
+                    <p><strong>Method:</strong> Two-stack algorithm respecting operator precedence</p>
+                    <div
+                        style="margin-top: 1rem; padding: 0.75rem; background: var(--bg-tertiary); border-radius: 6px; font-size: 0.85rem;">
+                        <div><strong>Input:</strong> (3+5)*2</div>
+                        <div><strong>Stacks:</strong> Values [3,5,8,2] | Ops [+,*]</div>
+                        <div><strong>Output:</strong> 16</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>Statistical Calculations</h4>
+                    <p><strong>Features:</strong> Mean, median, mode, variance, std deviation</p>
+                    <p><strong>Complexity:</strong> O(n log n) due to sorting for median</p>
+                    <p><strong>Formulas:</strong></p>
+                    <ul style="margin-top: 0.5rem; color: var(--text-secondary); font-size: 0.9rem;">
+                        <li>Mean: μ = Σx / n</li>
+                        <li>Variance: σ² = Σ(x - μ)² / n</li>
+                        <li>Std Dev: σ = √variance</li>
+                        <li>Median: Middle value when sorted</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h4>Quadratic Formula Solver</h4>
+                    <p><strong>Equation:</strong> ax² + bx + c = 0</p>
+                    <p><strong>Discriminant:</strong> Δ = b² - 4ac</p>
+                    <div style="margin-top: 1rem; font-size: 0.85rem;">
+                        <div
+                            style="padding: 0.5rem; background: var(--bg-tertiary); border-radius: 4px; margin-bottom: 0.5rem;">
+                            <strong>Δ > 0:</strong> Two distinct real roots
+                        </div>
+                        <div
+                            style="padding: 0.5rem; background: var(--bg-tertiary); border-radius: 4px; margin-bottom: 0.5rem;">
+                            <strong>Δ = 0:</strong> One repeated real root
+                        </div>
+                        <div style="padding: 0.5rem; background: var(--bg-tertiary); border-radius: 4px;">
+                            <strong>Δ < 0:</strong> Two complex conjugate roots
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Advanced Features Deep Dive</h3>
+
+            <div class="feature-list">
+                <div class="feature-item">
+                    <strong>Expression Parser:</strong> Handles +, -, *, /, ^ with proper precedence
+                </div>
+                <div class="feature-item">
+                    <strong>Trigonometry:</strong> sin, cos, tan, asin, acos, atan, sinh, cosh, tanh
+                </div>
+                <div class="feature-item">
+                    <strong>Logarithms:</strong> Natural log, base-10, base-2
+                </div>
+                <div class="feature-item">
+                    <strong>Roots & Powers:</strong> Square root, cube root, nth root, power function
+                </div>
+                <div class="feature-item">
+                    <strong>Combinatorics:</strong> Permutations (nPr) and Combinations (nCr)
+                </div>
+                <div class="feature-item">
+                    <strong>Number Systems:</strong> Binary, Octal, Decimal, Hexadecimal conversion
+                </div>
+                <div class="feature-item">
+                    <strong>Unit Conversion:</strong> Length, temperature, weight conversions
+                </div>
+                <div class="feature-item">
+                    <strong>Matrix Ops:</strong> Addition and multiplication up to 10×10 matrices
+                </div>
+                <div class="feature-item">
+                    <strong>Complex Numbers:</strong> Full arithmetic with magnitude and phase
+                </div>
+                <div class="feature-item">
+                    <strong>Rounding:</strong> Ceiling, floor, round to nearest
+                </div>
+                <div class="feature-item">
+                    <strong>Factorial:</strong> Supports up to 170! (double precision limit)
+                </div>
+                <div class="feature-item">
+                    <strong>Absolute Value:</strong> Distance from zero
+                </div>
+            </div>
+        </section>
+
+        <!-- SETUP GUIDE SECTION -->
+        <section id="setup" class="reveal">
+            <h2>🚀 Complete Setup Guide</h2>
+
+            <h3>Prerequisites</h3>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>Requirement</th>
+                        <th>Why It's Needed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>C++ Compiler</strong></td>
+                        <td>GCC 4.8+, Clang 3.3+, or MSVC 2015+</td>
+                        <td>Compile C++11 standard code</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Standard Library</strong></td>
+                        <td>C++ Standard Library (included)</td>
+                        <td>Math functions, I/O, containers</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Terminal</strong></td>
+                        <td>ANSI color support (recommended)</td>
+                        <td>Display colored themes properly</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Unicode Support</strong></td>
+                        <td>UTF-8 capable terminal</td>
+                        <td>Display box-drawing characters</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Installation Steps</h3>
+
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Download the Source Code</h4>
+                        <p>Clone the repository or download <span class="inline-code">Calculator.cpp</span> to your
+                            local machine.</p>
+                        <div class="code-container" style="margin-top: 1rem;">
+                            <pre><code><span class="comment"># If using git</span>
+git clone https://github.com/yjaveria3-netizen/Calculator.git
+cd calculator-project
+
+<span class="comment"># Or simply download Calculator.cpp</span></code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Compile the Program</h4>
+                        <p>Use your C++ compiler with C++11 standard flag:</p>
+                        <div class="code-container" style="margin-top: 1rem;">
+                            <pre><code><span class="comment"># For Linux/macOS with g++</span>
+g++ -std=c++11 Calculator.cpp -o calculator
+
+<span class="comment"># With optimizations (recommended)</span>
+g++ -std=c++11 -O3 Calculator.cpp -o calculator
+
+<span class="comment"># For Windows with MinGW</span>
+g++ -std=c++11 Calculator.cpp -o calculator.exe
+
+<span class="comment"># With all warnings (for development)</span>
+g++ -std=c++11 -Wall -Wextra Calculator.cpp -o calculator</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Run the Calculator</h4>
+                        <p>Execute the compiled binary:</p>
+                        <div class="code-container" style="margin-top: 1rem;">
+                            <pre><code><span class="comment"># On Linux/macOS</span>
+./calculator
+
+<span class="comment"># On Windows</span>
+calculator.exe</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>Test Your Installation</h4>
+                        <p>Try a simple calculation to verify everything works:</p>
+                        <ol style="margin-top: 0.5rem; color: var(--text-secondary);">
+                            <li>Choose option <strong>1</strong> (Addition)</li>
+                            <li>Enter first number: <strong>42</strong></li>
+                            <li>Enter second number: <strong>8</strong></li>
+                            <li>Expected result: <strong>50.000000</strong></li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <div class="callout warning">
+                <div class="callout-title">⚠️ Troubleshooting Common Issues</div>
+                <ul style="margin-top: 0.5rem; color: var(--text-secondary);">
+                    <li><strong>Colors not showing:</strong> Switch to Monochrome theme (option 44) or use a terminal
+                        with ANSI support</li>
+                    <li><strong>Compilation errors:</strong> Ensure you're using the <span
+                            class="inline-code">-std=c++11</span> flag</li>
+                    <li><strong>Strange characters:</strong> Enable UTF-8 encoding in your terminal settings</li>
+                    <li><strong>Division by zero:</strong> Calculator handles this gracefully with error messages</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- CONTRIBUTE SECTION -->
+        <section id="contribute" class="reveal">
+            <div class="contribute-banner">
+                <h3>🤝 We Appreciate Your Contributions!</h3>
+                <p>Join us in making this calculator even better. Every contribution matters!</p>
+            </div>
+
+            <h2>How to Contribute</h2>
+
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon">🐛</div>
+                    <h4>Report Bugs</h4>
+                    <p>Found a bug? Please include:</p>
+                    <ul style="margin-top: 0.5rem; color: var(--text-secondary); font-size: 0.9rem;">
+                        <li>OS and compiler version</li>
+                        <li>Steps to reproduce</li>
+                        <li>Expected vs actual behavior</li>
+                        <li>Screenshots if applicable</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon">💻</div>
+                    <h4>Add Features</h4>
+                    <p>Priority areas for contribution:</p>
+                    <ul style="margin-top: 0.5rem; color: var(--text-secondary); font-size: 0.9rem;">
+                        <li>Performance optimizations</li>
+                        <li>New mathematical functions</li>
+                        <li>UI/UX improvements</li>
+                        <li>Better error handling</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon">📚</div>
+                    <h4>Improve Documentation</h4>
+                    <p>Help others understand:</p>
+                    <ul style="margin-top: 0.5rem; color: var(--text-secondary); font-size: 0.9rem;">
+                        <li>Fix typos and unclear sections</li>
+                        <li>Add more code examples</li>
+                        <li>Create video tutorials</li>
+                        <li>Translate to other languages</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon">🎨</div>
+                    <h4>Design Contributions</h4>
+                    <p>Make it more beautiful:</p>
+                    <ul style="margin-top: 0.5rem; color: var(--text-secondary); font-size: 0.9rem;">
+                        <li>Propose new color themes</li>
+                        <li>Improve ASCII art</li>
+                        <li>Suggest UI layouts</li>
+                        <li>Create project logos</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>Contribution Workflow</h3>
+
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Fork & Clone</h4>
+                        <p>Create your own copy of the repository and clone it to your local machine.</p>
+                        <div class="code-container" style="margin-top: 1rem;">
+                            <pre><code>git clone &lt;your-fork-url&gt;
+cd calculator-project</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Create a Branch</h4>
+                        <p>Make a new branch for your feature or fix. Use descriptive names!</p>
+                        <div class="code-container" style="margin-top: 1rem;">
+                            <pre><code>git checkout -b feature/add-derivative-calculator
+<span class="comment"># or</span>
+git checkout -b fix/division-by-zero-edge-case</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Make Your Changes</h4>
+                        <p>Write clean, well-commented code following the existing style:</p>
+                        <ul style="margin-top: 0.5rem; color: var(--text-secondary);">
+                            <li>Use clear variable and function names</li>
+                            <li>Add comments for complex logic</li>
+                            <li>Follow existing indentation (4 spaces)</li>
+                            <li>Test thoroughly before committing</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>Test Your Code</h4>
+                        <p>Compile and test extensively:</p>
+                        <div class="code-container" style="margin-top: 1rem;">
+                            <pre><code><span class="comment"># Compile with warnings</span>
+g++ -std=c++11 -Wall -Wextra Calculator.cpp -o calculator
+
+<span class="comment"># Test your feature</span>
+./calculator
+
+<span class="comment"># Test edge cases!</span></code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h4>Commit & Push</h4>
+                        <p>Write meaningful commit messages:</p>
+                        <div class="code-container" style="margin-top: 1rem;">
+                            <pre><code>git add Calculator.cpp
+git commit -m <span class="string">"Add derivative calculator using numerical methods"</span>
+git push origin feature/add-derivative-calculator</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">6</div>
+                    <div class="step-content">
+                        <h4>Submit Pull Request</h4>
+                        <p>Create a PR with a clear description:</p>
+                        <ul style="margin-top: 0.5rem; color: var(--text-secondary);">
+                            <li>What does this PR add/fix?</li>
+                            <li>How did you test it?</li>
+                            <li>Any breaking changes?</li>
+                            <li>Screenshots (if UI changes)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Coding Standards</h3>
+
+            <div class="code-container">
+                <div class="code-header">
+                    <span class="code-title">Example: Well-Documented Function</span>
+                    <span class="code-lang">C++</span>
+                </div>
+                <pre><code><span class="comment">/**
+ * Calculates the factorial of a number using iteration
+ * 
+ * @param n The number to calculate factorial for (must be non-negative)
+ * @return The factorial value, or 0 if input is invalid
+ * 
+ * Note: Maximum supported value is 170 due to double precision limits
+ * Example: factorial(5) returns 120.0
+ */</span>
+<span class="keyword">double</span> <span class="function">factorial</span>(<span class="keyword">int</span> n) {
+    <span class="comment">// Input validation</span>
+    <span class="keyword">if</span> (n &lt; <span class="number">0</span>) {
+        std::cout &lt;&lt; theme-&gt;error 
+                  &lt;&lt; <span class="string">"Error: Factorial undefined for negative numbers!"</span> 
+                  &lt;&lt; theme-&gt;reset &lt;&lt; std::endl;
+        <span class="keyword">return</span> <span class="number">0</span>;
+    }
+    
+    <span class="comment">// Handle overflow prevention</span>
+    <span class="keyword">if</span> (n &gt; <span class="number">170</span>) {
+        std::cout &lt;&lt; theme-&gt;warning 
+                  &lt;&lt; <span class="string">"Warning: Result will overflow. Max supported is 170!"</span> 
+                  &lt;&lt; theme-&gt;reset &lt;&lt; std::endl;
+    }
+    
+    <span class="comment">// Base case</span>
+    <span class="keyword">if</span> (n == <span class="number">0</span> || n == <span class="number">1</span>) <span class="keyword">return</span> <span class="number">1.0</span>;
+    
+    <span class="comment">// Iterative calculation (more efficient than recursion)</span>
+    <span class="keyword">double</span> result = <span class="number">1.0</span>;
+    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">2</span>; i &lt;= n; i++) {
+        result *= i;
+    }
+    
+    <span class="keyword">return</span> result;
+}</code></pre>
+            </div>
+
+            <div class="callout success">
+                <div class="callout-title">✅ Code Quality Checklist</div>
+                <ul style="margin-top: 0.5rem; color: var(--text-secondary);">
+                    <li>✓ Clear, descriptive function and variable names</li>
+                    <li>✓ Comprehensive input validation</li>
+                    <li>✓ Proper error handling with user-friendly messages</li>
+                    <li>✓ Comments explaining complex algorithms</li>
+                    <li>✓ Consistent formatting (4-space indentation)</li>
+                    <li>✓ No memory leaks (use RAII principles)</li>
+                    <li>✓ Tested with edge cases and invalid inputs</li>
+                </ul>
+            </div>
+
+            <h3>Areas We'd Love Help With</h3>
+
+            <div class="feature-list">
+                <div class="feature-item">
+                    <strong>Function Calls in Expressions:</strong> Enable sin(45), sqrt(16) in expression parser
+                </div>
+                <div class="feature-item">
+                    <strong>Variable Support:</strong> Allow x = 5, y = x * 2 style operations
+                </div>
+                <div class="feature-item">
+                    <strong>Derivative Calculator:</strong> Symbolic or numerical differentiation
+                </div>
+                <div class="feature-item">
+                    <strong>Integration:</strong> Numerical integration (trapezoidal, Simpson's rule)
+                </div>
+                <div class="feature-item">
+                    <strong>Graph Plotting:</strong> ASCII-based function visualization
+                </div>
+                <div class="feature-item">
+                    <strong>More Unit Conversions:</strong> Time, data size, pressure, etc.
+                </div>
+                <div class="feature-item">
+                    <strong>Configuration File:</strong> Persistent settings across sessions
+                </div>
+                <div class="feature-item">
+                    <strong>Copy to Clipboard:</strong> One-click result copying
+                </div>
+                <div class="feature-item">
+                    <strong>Multi-line Expressions:</strong> Support for longer, complex expressions
+                </div>
+                <div class="feature-item">
+                    <strong>Tutorial Mode:</strong> Interactive learning for new users
+                </div>
+            </div>
+
+            <div style="text-align: center; margin: 3rem 0;">
+                <h3 style="color: var(--accent-primary); margin-bottom: 1rem;">Ready to Contribute?</h3>
+                <p style="color: var(--text-secondary); font-size: 1.2rem;">
+                    We appreciate every contribution, no matter how small. Your code could help thousands of users!
+                </p>
+                <p style="color: var(--text-secondary); margin-top: 1rem; font-size: 1.1rem;">
+                    ⭐ Star the project • 🍴 Fork and create • 🚀 Submit your PR
+                </p>
+            </div>
+        </section>
+
+        <footer>
+            <p>Built with <span class="footer-heart">❤️</span> for the love of mathematics</p>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">
+                "Mathematics is the language with which God has written the universe." - Galileo Galilei
+            </p>
+            <p style="margin-top: 1rem;">
+                <strong>Ultimate Scientific Calculator</strong> • Educational & Open Source
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // Scroll reveal animation
+        const reveals = document.querySelectorAll('.reveal');
+
+        const revealOnScroll = () => {
+            reveals.forEach(element => {
+                const elementTop = element.getBoundingClientRect().top;
+                const windowHeight = window.innerHeight;
+
+                if (elementTop < windowHeight - 100) {
+                    element.classList.add('active');
+                }
+            });
+        };
+
+        window.addEventListener('scroll', revealOnScroll);
+        revealOnScroll(); // Initial check
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('nav a').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+    </script>
+</body>
+
+</html>
