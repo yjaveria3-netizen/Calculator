@@ -12,6 +12,7 @@
 #include <cctype>
 #include <map>
 #include <ctime>
+#include <chrono>
 
 // Color Themes
 enum ColorTheme
@@ -188,6 +189,12 @@ void memoryAdd(double value)
 {
     memory += value;
     std::cout << theme->success << "Added to memory. New value: " << memory << theme->reset << std::endl;
+}
+
+void memorySubtract(double value)
+{
+    memory -= value;
+    std::cout << theme->success << "Subtracted from memory. New value: " << memory << theme->reset << std::endl;
 }
 
 // Expression Parser
@@ -384,6 +391,18 @@ public:
         addToHistory(ph, "phase");
     }
 
+    static void conjugate()
+    {
+        std::cout << theme->primary << "\n=== Complex Conjugate ===" << theme->reset << std::endl;
+        double r = getValidNumber("Enter real part: ");
+        double i = getValidNumber("Enter imaginary part: ");
+
+        std::complex<double> c(r, i);
+        std::complex<double> result = std::conj(c);
+
+        displayComplex(result, "Conjugate");
+    }
+
 private:
     static void displayComplex(const std::complex<double> &c, const std::string &label)
     {
@@ -405,8 +424,9 @@ void complexNumberMenu()
     std::cout << "2. Multiplication\n";
     std::cout << "3. Magnitude\n";
     std::cout << "4. Phase/Argument\n";
+    std::cout << "5. Conjugate\n";
 
-    int choice = getValidChoice(1, 4);
+    int choice = getValidChoice(1, 5);
 
     switch (choice)
     {
@@ -421,6 +441,9 @@ void complexNumberMenu()
         break;
     case 4:
         ComplexCalculator::phase();
+        break;
+    case 5:
+        ComplexCalculator::conjugate();
         break;
     }
 }
@@ -507,12 +530,47 @@ void saveStatisticsToFile(const std::vector<double> &data)
     std::sort(sorted.begin(), sorted.end());
     double median = (sorted.size() % 2 == 0) ? (sorted[sorted.size() / 2 - 1] + sorted[sorted.size() / 2]) / 2.0 : sorted[sorted.size() / 2];
 
+    // Calculate mode
+    std::map<double, int> frequency;
+    for (double num : data)
+        frequency[num]++;
+
+    int maxFreq = 0;
+    std::vector<double> modes;
+    for (const auto &pair : frequency)
+    {
+        if (pair.second > maxFreq)
+        {
+            maxFreq = pair.second;
+            modes.clear();
+            modes.push_back(pair.first);
+        }
+        else if (pair.second == maxFreq)
+        {
+            modes.push_back(pair.first);
+        }
+    }
+
     file << "Count: " << data.size() << std::endl;
     file << "Sum: " << sum << std::endl;
     file << "Mean: " << mean << std::endl;
     file << "Median: " << median << std::endl;
+    file << "Mode: ";
+    if (modes.size() == data.size())
+        file << "No mode";
+    else
+    {
+        for (int i = 0; i < modes.size(); i++)
+        {
+            file << modes[i];
+            if (i < modes.size() - 1)
+                file << ", ";
+        }
+    }
+    file << std::endl;
     file << "Min: " << *std::min_element(data.begin(), data.end()) << std::endl;
     file << "Max: " << *std::max_element(data.begin(), data.end()) << std::endl;
+    file << "Range: " << (*std::max_element(data.begin(), data.end()) - *std::min_element(data.begin(), data.end())) << std::endl;
     file << "Variance: " << variance << std::endl;
     file << "Std Dev: " << std::sqrt(variance) << std::endl;
 
@@ -581,10 +639,54 @@ double modulus(double num1, double num2)
     return std::fmod(num1, num2);
 }
 
+double percentage()
+{
+    double num = getValidNumber("Enter number: ");
+    double percent = getValidNumber("Enter percentage: ");
+    return (num * percent) / 100.0;
+}
+
 // Trigonometric functions
 double sine() { return std::sin(getValidNumber("Enter angle in radians: ")); }
 double cosine() { return std::cos(getValidNumber("Enter angle in radians: ")); }
 double tangent() { return std::tan(getValidNumber("Enter angle in radians: ")); }
+
+// NEW: Reciprocal trigonometric functions
+double cosecant()
+{
+    double angle = getValidNumber("Enter angle in radians: ");
+    double sinVal = std::sin(angle);
+    if (std::abs(sinVal) < 1e-10)
+    {
+        std::cout << theme->error << "Error: Cosecant undefined (sin = 0)" << theme->reset << std::endl;
+        return std::numeric_limits<double>::infinity();
+    }
+    return 1.0 / sinVal;
+}
+
+double secant()
+{
+    double angle = getValidNumber("Enter angle in radians: ");
+    double cosVal = std::cos(angle);
+    if (std::abs(cosVal) < 1e-10)
+    {
+        std::cout << theme->error << "Error: Secant undefined (cos = 0)" << theme->reset << std::endl;
+        return std::numeric_limits<double>::infinity();
+    }
+    return 1.0 / cosVal;
+}
+
+double cotangent()
+{
+    double angle = getValidNumber("Enter angle in radians: ");
+    double tanVal = std::tan(angle);
+    if (std::abs(tanVal) < 1e-10)
+    {
+        std::cout << theme->error << "Error: Cotangent undefined (tan = 0)" << theme->reset << std::endl;
+        return std::numeric_limits<double>::infinity();
+    }
+    return 1.0 / tanVal;
+}
 
 double arcsine()
 {
@@ -656,6 +758,23 @@ double log2Func()
     return std::log2(num);
 }
 
+double logBase()
+{
+    double num = getValidNumber("Enter positive number: ");
+    while (num <= 0)
+    {
+        std::cout << theme->error << "Error: Logarithm undefined for non-positive numbers!" << theme->reset << std::endl;
+        num = getValidNumber("Enter positive number: ");
+    }
+    double base = getValidNumber("Enter positive base (≠ 1): ");
+    while (base <= 0 || base == 1)
+    {
+        std::cout << theme->error << "Error: Base must be positive and not equal to 1!" << theme->reset << std::endl;
+        base = getValidNumber("Enter positive base (≠ 1): ");
+    }
+    return std::log(num) / std::log(base);
+}
+
 // Root functions
 double squareRoot()
 {
@@ -705,6 +824,9 @@ double ceiling() { return std::ceil(getValidNumber("Enter number: ")); }
 double floor() { return std::floor(getValidNumber("Enter number: ")); }
 double roundNum() { return std::round(getValidNumber("Enter number: ")); }
 
+// NEW: Truncate function
+double truncateNum() { return std::trunc(getValidNumber("Enter number: ")); }
+
 // Conversion functions
 double degreeToRadian() { return getValidNumber("Enter angle in degrees: ") * M_PI / 180.0; }
 double radianToDegree() { return getValidNumber("Enter angle in radians: ") * 180.0 / M_PI; }
@@ -737,11 +859,45 @@ void statistics()
     std::sort(sorted.begin(), sorted.end());
     double median = (n % 2 == 0) ? (sorted[n / 2 - 1] + sorted[n / 2]) / 2.0 : sorted[n / 2];
 
+    // Calculate mode
+    std::map<double, int> frequency;
+    for (double num : numbers)
+        frequency[num]++;
+
+    int maxFreq = 0;
+    std::vector<double> modes;
+    for (const auto &pair : frequency)
+    {
+        if (pair.second > maxFreq)
+        {
+            maxFreq = pair.second;
+            modes.clear();
+            modes.push_back(pair.first);
+        }
+        else if (pair.second == maxFreq)
+        {
+            modes.push_back(pair.first);
+        }
+    }
+
     std::cout << theme->success << "\n=== Statistics ===" << theme->reset << std::endl;
     std::cout << "Count: " << n << std::endl;
     std::cout << "Sum: " << sum << std::endl;
     std::cout << "Mean: " << mean << std::endl;
     std::cout << "Median: " << median << std::endl;
+    std::cout << "Mode: ";
+    if (modes.size() == numbers.size())
+        std::cout << "No mode";
+    else
+    {
+        for (int i = 0; i < modes.size(); i++)
+        {
+            std::cout << modes[i];
+            if (i < modes.size() - 1)
+                std::cout << ", ";
+        }
+    }
+    std::cout << std::endl;
     std::cout << "Minimum: " << minVal << std::endl;
     std::cout << "Maximum: " << maxVal << std::endl;
     std::cout << "Range: " << (maxVal - minVal) << std::endl;
@@ -827,6 +983,56 @@ void gcdLcm()
 
     addToHistory(gcdVal, "GCD");
     addToHistory(lcmVal, "LCM");
+}
+
+// NEW: Prime number checker
+bool isPrime(int n)
+{
+    if (n <= 1)
+        return false;
+    if (n <= 3)
+        return true;
+    if (n % 2 == 0 || n % 3 == 0)
+        return false;
+
+    for (int i = 5; i * i <= n; i += 6)
+    {
+        if (n % i == 0 || n % (i + 2) == 0)
+            return false;
+    }
+    return true;
+}
+
+void primeChecker()
+{
+    int num = static_cast<int>(getValidNumber("Enter a positive integer: "));
+
+    if (num <= 0)
+    {
+        std::cout << theme->error << "Please enter a positive integer!" << theme->reset << std::endl;
+        return;
+    }
+
+    std::cout << theme->success << "\n=== Prime Check ===" << theme->reset << std::endl;
+    std::cout << "Number: " << num << std::endl;
+
+    if (isPrime(num))
+    {
+        std::cout << theme->success << num << " is a PRIME number!" << theme->reset << std::endl;
+    }
+    else
+    {
+        std::cout << theme->warning << num << " is NOT a prime number." << theme->reset << std::endl;
+
+        // Show factors
+        std::cout << "Factors: ";
+        for (int i = 1; i <= num; i++)
+        {
+            if (num % i == 0)
+                std::cout << i << " ";
+        }
+        std::cout << std::endl;
+    }
 }
 
 // Quadratic Equation Solver
@@ -920,48 +1126,45 @@ void matrixAddition()
 
 void matrixMultiplication()
 {
-    int rows1, cols1, rows2, cols2;
-    std::cout << "Matrix 1 - Enter number of rows: ";
-    std::cin >> rows1;
-    std::cout << "Matrix 1 - Enter number of columns: ";
-    std::cin >> cols1;
-    std::cout << "Matrix 2 - Enter number of rows: ";
-    std::cin >> rows2;
-    std::cout << "Matrix 2 - Enter number of columns: ";
-    std::cin >> cols2;
+    int r1, c1, r2, c2;
+    std::cout << "Enter rows for Matrix 1: ";
+    std::cin >> r1;
+    std::cout << "Enter columns for Matrix 1: ";
+    std::cin >> c1;
+    std::cout << "Enter rows for Matrix 2: ";
+    std::cin >> r2;
+    std::cout << "Enter columns for Matrix 2: ";
+    std::cin >> c2;
 
-    while (cols1 != rows2)
+    if (c1 != r2)
     {
         std::cout << theme->error << "Error: Matrix 1 columns must equal Matrix 2 rows!" << theme->reset << std::endl;
-        std::cout << "Matrix 1 - Enter number of columns: ";
-        std::cin >> cols1;
-        std::cout << "Matrix 2 - Enter number of rows: ";
-        std::cin >> rows2;
+        return;
     }
 
-    std::vector<std::vector<double>> matrix1(rows1, std::vector<double>(cols1));
-    std::vector<std::vector<double>> matrix2(rows2, std::vector<double>(cols2));
-    std::vector<std::vector<double>> result(rows1, std::vector<double>(cols2, 0));
+    std::vector<std::vector<double>> matrix1(r1, std::vector<double>(c1));
+    std::vector<std::vector<double>> matrix2(r2, std::vector<double>(c2));
+    std::vector<std::vector<double>> result(r1, std::vector<double>(c2, 0));
 
     std::cout << "\nEnter elements of Matrix 1:" << std::endl;
-    for (int i = 0; i < rows1; i++)
-        for (int j = 0; j < cols1; j++)
+    for (int i = 0; i < r1; i++)
+        for (int j = 0; j < c1; j++)
             matrix1[i][j] = getValidNumber("Element [" + std::to_string(i) + "][" + std::to_string(j) + "]: ");
 
     std::cout << "\nEnter elements of Matrix 2:" << std::endl;
-    for (int i = 0; i < rows2; i++)
-        for (int j = 0; j < cols2; j++)
+    for (int i = 0; i < r2; i++)
+        for (int j = 0; j < c2; j++)
             matrix2[i][j] = getValidNumber("Element [" + std::to_string(i) + "][" + std::to_string(j) + "]: ");
 
-    for (int i = 0; i < rows1; i++)
-        for (int j = 0; j < cols2; j++)
-            for (int k = 0; k < cols1; k++)
+    for (int i = 0; i < r1; i++)
+        for (int j = 0; j < c2; j++)
+            for (int k = 0; k < c1; k++)
                 result[i][j] += matrix1[i][k] * matrix2[k][j];
 
     std::cout << theme->success << "\n=== Result Matrix ===" << theme->reset << std::endl;
-    for (int i = 0; i < rows1; i++)
+    for (int i = 0; i < r1; i++)
     {
-        for (int j = 0; j < cols2; j++)
+        for (int j = 0; j < c2; j++)
             std::cout << std::setw(10) << result[i][j] << " ";
         std::cout << std::endl;
     }
@@ -975,10 +1178,49 @@ void matrixMultiplication()
     }
 }
 
+// NEW: Matrix Transpose
+void matrixTranspose()
+{
+    int rows, cols;
+    std::cout << "Enter number of rows: ";
+    std::cin >> rows;
+    std::cout << "Enter number of columns: ";
+    std::cin >> cols;
+
+    std::vector<std::vector<double>> matrix(rows, std::vector<double>(cols));
+    std::vector<std::vector<double>> transpose(cols, std::vector<double>(rows));
+
+    std::cout << "\nEnter elements of Matrix:" << std::endl;
+    for (int i = 0; i < rows; i++)
+        for (int j = 0; j < cols; j++)
+            matrix[i][j] = getValidNumber("Element [" + std::to_string(i) + "][" + std::to_string(j) + "]: ");
+
+    // Transpose
+    for (int i = 0; i < rows; i++)
+        for (int j = 0; j < cols; j++)
+            transpose[j][i] = matrix[i][j];
+
+    std::cout << theme->success << "\n=== Original Matrix ===" << theme->reset << std::endl;
+    for (int i = 0; i < rows; i++)
+    {
+        for (int j = 0; j < cols; j++)
+            std::cout << std::setw(10) << matrix[i][j] << " ";
+        std::cout << std::endl;
+    }
+
+    std::cout << theme->success << "\n=== Transposed Matrix ===" << theme->reset << std::endl;
+    for (int i = 0; i < cols; i++)
+    {
+        for (int j = 0; j < rows; j++)
+            std::cout << std::setw(10) << transpose[i][j] << " ";
+        std::cout << std::endl;
+    }
+}
+
 // Number System Conversions
 void numberSystemConversion()
 {
-    std::cout << theme->primary << "\n=== Number System Conversion ===" << theme->reset << std::endl;
+    std::cout << theme->accent << "\n┌─── Number System Conversion ───┐" << theme->reset << std::endl;
     std::cout << "1. Decimal to Binary\n";
     std::cout << "2. Decimal to Octal\n";
     std::cout << "3. Decimal to Hexadecimal\n";
@@ -988,11 +1230,11 @@ void numberSystemConversion()
 
     int choice = getValidChoice(1, 6);
     long long num;
+    std::string input;
 
     switch (choice)
     {
     case 1:
-    {
         num = static_cast<long long>(getValidNumber("Enter decimal number: "));
         std::cout << theme->success << "Binary: ";
         if (num == 0)
@@ -1000,297 +1242,150 @@ void numberSystemConversion()
         else
         {
             std::string binary = "";
-            long long temp = std::abs(num);
+            long long temp = num;
             while (temp > 0)
             {
-                binary = std::to_string(temp % 2) + binary;
+                binary = (char)('0' + temp % 2) + binary;
                 temp /= 2;
             }
-            if (num < 0)
-                std::cout << "-";
             std::cout << binary;
         }
         std::cout << theme->reset << std::endl;
         break;
-    }
 
     case 2:
-    {
         num = static_cast<long long>(getValidNumber("Enter decimal number: "));
-        std::cout << theme->success << "Octal: " << std::oct << num << theme->reset << std::endl;
+        std::cout << theme->success << "Octal: " << std::oct << num << std::dec << theme->reset << std::endl;
         break;
-    }
 
     case 3:
-    {
         num = static_cast<long long>(getValidNumber("Enter decimal number: "));
-        std::cout << theme->success << "Hexadecimal: " << std::hex << std::uppercase << num << theme->reset << std::endl;
+        std::cout << theme->success << "Hexadecimal: " << std::hex << num << std::dec << theme->reset << std::endl;
         break;
-    }
 
     case 4:
-    {
-        std::string binary;
+        clearInput();
         std::cout << "Enter binary number: ";
-        std::cin >> binary;
-        long long decimal = 0;
-        for (char c : binary)
-        {
-            if (c != '0' && c != '1')
-            {
-                std::cout << theme->error << "Invalid binary number!" << theme->reset << std::endl;
-                return;
-            }
-            decimal = decimal * 2 + (c - '0');
-        }
-        std::cout << theme->success << "Decimal: " << decimal << theme->reset << std::endl;
-        addToHistory(decimal, "binary->decimal");
+        std::cin >> input;
+        num = std::stoll(input, nullptr, 2);
+        std::cout << theme->success << "Decimal: " << num << theme->reset << std::endl;
+        addToHistory(num, "binary->decimal");
         break;
-    }
 
     case 5:
-    {
-        std::string octal;
+        clearInput();
         std::cout << "Enter octal number: ";
-        std::cin >> octal;
-        long long decimal = 0;
-        for (char c : octal)
-        {
-            if (c < '0' || c > '7')
-            {
-                std::cout << theme->error << "Invalid octal number!" << theme->reset << std::endl;
-                return;
-            }
-            decimal = decimal * 8 + (c - '0');
-        }
-        std::cout << theme->success << "Decimal: " << decimal << theme->reset << std::endl;
-        addToHistory(decimal, "octal->decimal");
+        std::cin >> input;
+        num = std::stoll(input, nullptr, 8);
+        std::cout << theme->success << "Decimal: " << num << theme->reset << std::endl;
+        addToHistory(num, "octal->decimal");
         break;
-    }
 
     case 6:
-    {
-        std::string hex;
+        clearInput();
         std::cout << "Enter hexadecimal number: ";
-        std::cin >> hex;
-        long long decimal = 0;
-        for (char c : hex)
-        {
-            c = toupper(c);
-            if ((c < '0' || c > '9') && (c < 'A' || c > 'F'))
-            {
-                std::cout << theme->error << "Invalid hexadecimal number!" << theme->reset << std::endl;
-                return;
-            }
-            int digit = (c >= 'A') ? (c - 'A' + 10) : (c - '0');
-            decimal = decimal * 16 + digit;
-        }
-        std::cout << theme->success << "Decimal: " << decimal << theme->reset << std::endl;
-        addToHistory(decimal, "hex->decimal");
+        std::cin >> input;
+        num = std::stoll(input, nullptr, 16);
+        std::cout << theme->success << "Decimal: " << num << theme->reset << std::endl;
+        addToHistory(num, "hex->decimal");
         break;
-    }
     }
 }
 
 // Unit Conversions
 void unitConversions()
 {
-    std::cout << theme->primary << "\n=== Unit Conversions ===" << theme->reset << std::endl;
-    std::cout << "1. Temperature (C ↔ F ↔ K)\n";
-    std::cout << "2. Length (m ↔ ft ↔ in)\n";
-    std::cout << "3. Weight (kg ↔ lb ↔ oz)\n";
-    std::cout << "4. Speed (km/h ↔ mph ↔ m/s)\n";
-    std::cout << "5. Area (m² ↔ ft² ↔ acres)\n";
-    std::cout << "6. Volume (L ↔ gal ↔ ml)\n";
+    std::cout << theme->accent << "\n┌─── Unit Conversions ───┐" << theme->reset << std::endl;
+    std::cout << "1. Celsius to Fahrenheit\n";
+    std::cout << "2. Fahrenheit to Celsius\n";
+    std::cout << "3. Celsius to Kelvin\n";
+    std::cout << "4. Kelvin to Celsius\n";
+    std::cout << "5. Meters to Feet\n";
+    std::cout << "6. Feet to Meters\n";
+    std::cout << "7. Kilometers to Miles\n";
+    std::cout << "8. Miles to Kilometers\n";
+    std::cout << "9. Kilograms to Pounds\n";
+    std::cout << "10. Pounds to Kilograms\n";
 
-    int choice = getValidChoice(1, 6);
+    int choice = getValidChoice(1, 10);
     double value, result;
 
     switch (choice)
     {
-    case 1: // Temperature
-    {
-        std::cout << "1. Celsius to Fahrenheit\n";
-        std::cout << "2. Fahrenheit to Celsius\n";
-        std::cout << "3. Celsius to Kelvin\n";
-        std::cout << "4. Kelvin to Celsius\n";
-        int tempChoice = getValidChoice(1, 4);
-        value = getValidNumber("Enter value: ");
-        switch (tempChoice)
-        {
-        case 1:
-            result = (value * 9 / 5) + 32;
-            std::cout << theme->success << value << "°C = " << result << "°F" << theme->reset << std::endl;
-            break;
-        case 2:
-            result = (value - 32) * 5 / 9;
-            std::cout << theme->success << value << "°F = " << result << "°C" << theme->reset << std::endl;
-            break;
-        case 3:
-            result = value + 273.15;
-            std::cout << theme->success << value << "°C = " << result << "K" << theme->reset << std::endl;
-            break;
-        case 4:
-            result = value - 273.15;
-            std::cout << theme->success << value << "K = " << result << "°C" << theme->reset << std::endl;
-            break;
-        }
-        addToHistory(result, "temp conversion");
+    case 1:
+        value = getValidNumber("Enter temperature in Celsius: ");
+        result = (value * 9.0 / 5.0) + 32;
+        std::cout << theme->success << value << "°C = " << result << "°F" << theme->reset << std::endl;
+        addToHistory(result, "C->F");
         break;
-    }
-
-    case 2: // Length
-    {
-        std::cout << "1. Meters to Feet\n2. Feet to Meters\n3. Meters to Inches\n4. Inches to Meters\n";
-        int lenChoice = getValidChoice(1, 4);
-        value = getValidNumber("Enter value: ");
-        switch (lenChoice)
-        {
-        case 1:
-            result = value * 3.28084;
-            std::cout << theme->success << value << " m = " << result << " ft" << theme->reset << std::endl;
-            break;
-        case 2:
-            result = value / 3.28084;
-            std::cout << theme->success << value << " ft = " << result << " m" << theme->reset << std::endl;
-            break;
-        case 3:
-            result = value * 39.3701;
-            std::cout << theme->success << value << " m = " << result << " in" << theme->reset << std::endl;
-            break;
-        case 4:
-            result = value / 39.3701;
-            std::cout << theme->success << value << " in = " << result << " m" << theme->reset << std::endl;
-            break;
-        }
-        addToHistory(result, "length conversion");
+    case 2:
+        value = getValidNumber("Enter temperature in Fahrenheit: ");
+        result = (value - 32) * 5.0 / 9.0;
+        std::cout << theme->success << value << "°F = " << result << "°C" << theme->reset << std::endl;
+        addToHistory(result, "F->C");
         break;
-    }
-
-    case 3: // Weight
-    {
-        std::cout << "1. Kilograms to Pounds\n2. Pounds to Kilograms\n3. Kilograms to Ounces\n4. Ounces to Kilograms\n";
-        int weightChoice = getValidChoice(1, 4);
-        value = getValidNumber("Enter value: ");
-        switch (weightChoice)
-        {
-        case 1:
-            result = value * 2.20462;
-            std::cout << theme->success << value << " kg = " << result << " lb" << theme->reset << std::endl;
-            break;
-        case 2:
-            result = value / 2.20462;
-            std::cout << theme->success << value << " lb = " << result << " kg" << theme->reset << std::endl;
-            break;
-        case 3:
-            result = value * 35.274;
-            std::cout << theme->success << value << " kg = " << result << " oz" << theme->reset << std::endl;
-            break;
-        case 4:
-            result = value / 35.274;
-            std::cout << theme->success << value << " oz = " << result << " kg" << theme->reset << std::endl;
-            break;
-        }
-        addToHistory(result, "weight conversion");
+    case 3:
+        value = getValidNumber("Enter temperature in Celsius: ");
+        result = value + 273.15;
+        std::cout << theme->success << value << "°C = " << result << "K" << theme->reset << std::endl;
+        addToHistory(result, "C->K");
         break;
-    }
-
-    case 4: // Speed
-    {
-        std::cout << "1. km/h to mph\n2. mph to km/h\n3. m/s to km/h\n4. km/h to m/s\n";
-        int speedChoice = getValidChoice(1, 4);
-        value = getValidNumber("Enter value: ");
-        switch (speedChoice)
-        {
-        case 1:
-            result = value * 0.621371;
-            std::cout << theme->success << value << " km/h = " << result << " mph" << theme->reset << std::endl;
-            break;
-        case 2:
-            result = value / 0.621371;
-            std::cout << theme->success << value << " mph = " << result << " km/h" << theme->reset << std::endl;
-            break;
-        case 3:
-            result = value * 3.6;
-            std::cout << theme->success << value << " m/s = " << result << " km/h" << theme->reset << std::endl;
-            break;
-        case 4:
-            result = value / 3.6;
-            std::cout << theme->success << value << " km/h = " << result << " m/s" << theme->reset << std::endl;
-            break;
-        }
-        addToHistory(result, "speed conversion");
+    case 4:
+        value = getValidNumber("Enter temperature in Kelvin: ");
+        result = value - 273.15;
+        std::cout << theme->success << value << "K = " << result << "°C" << theme->reset << std::endl;
+        addToHistory(result, "K->C");
         break;
-    }
-
-    case 5: // Area
-    {
-        std::cout << "1. m² to ft²\n2. ft² to m²\n3. m² to acres\n4. acres to m²\n";
-        int areaChoice = getValidChoice(1, 4);
-        value = getValidNumber("Enter value: ");
-        switch (areaChoice)
-        {
-        case 1:
-            result = value * 10.7639;
-            std::cout << theme->success << value << " m² = " << result << " ft²" << theme->reset << std::endl;
-            break;
-        case 2:
-            result = value / 10.7639;
-            std::cout << theme->success << value << " ft² = " << result << " m²" << theme->reset << std::endl;
-            break;
-        case 3:
-            result = value / 4046.86;
-            std::cout << theme->success << value << " m² = " << result << " acres" << theme->reset << std::endl;
-            break;
-        case 4:
-            result = value * 4046.86;
-            std::cout << theme->success << value << " acres = " << result << " m²" << theme->reset << std::endl;
-            break;
-        }
-        addToHistory(result, "area conversion");
+    case 5:
+        value = getValidNumber("Enter length in meters: ");
+        result = value * 3.28084;
+        std::cout << theme->success << value << " m = " << result << " ft" << theme->reset << std::endl;
+        addToHistory(result, "m->ft");
         break;
-    }
-
-    case 6: // Volume
-    {
-        std::cout << "1. Liters to Gallons\n2. Gallons to Liters\n3. Liters to Milliliters\n4. Milliliters to Liters\n";
-        int volChoice = getValidChoice(1, 4);
-        value = getValidNumber("Enter value: ");
-        switch (volChoice)
-        {
-        case 1:
-            result = value * 0.264172;
-            std::cout << theme->success << value << " L = " << result << " gal" << theme->reset << std::endl;
-            break;
-        case 2:
-            result = value / 0.264172;
-            std::cout << theme->success << value << " gal = " << result << " L" << theme->reset << std::endl;
-            break;
-        case 3:
-            result = value * 1000;
-            std::cout << theme->success << value << " L = " << result << " mL" << theme->reset << std::endl;
-            break;
-        case 4:
-            result = value / 1000;
-            std::cout << theme->success << value << " mL = " << result << " L" << theme->reset << std::endl;
-            break;
-        }
-        addToHistory(result, "volume conversion");
+    case 6:
+        value = getValidNumber("Enter length in feet: ");
+        result = value / 3.28084;
+        std::cout << theme->success << value << " ft = " << result << " m" << theme->reset << std::endl;
+        addToHistory(result, "ft->m");
         break;
-    }
+    case 7:
+        value = getValidNumber("Enter distance in kilometers: ");
+        result = value * 0.621371;
+        std::cout << theme->success << value << " km = " << result << " mi" << theme->reset << std::endl;
+        addToHistory(result, "km->mi");
+        break;
+    case 8:
+        value = getValidNumber("Enter distance in miles: ");
+        result = value / 0.621371;
+        std::cout << theme->success << value << " mi = " << result << " km" << theme->reset << std::endl;
+        addToHistory(result, "mi->km");
+        break;
+    case 9:
+        value = getValidNumber("Enter weight in kilograms: ");
+        result = value * 2.20462;
+        std::cout << theme->success << value << " kg = " << result << " lbs" << theme->reset << std::endl;
+        addToHistory(result, "kg->lbs");
+        break;
+    case 10:
+        value = getValidNumber("Enter weight in pounds: ");
+        result = value / 2.20462;
+        std::cout << theme->success << value << " lbs = " << result << " kg" << theme->reset << std::endl;
+        addToHistory(result, "lbs->kg");
+        break;
     }
 }
 
-// Memory Menu
+// Memory operations menu
 void memoryMenu()
 {
     std::cout << theme->accent << "\n┌─── Memory Operations ───┐" << theme->reset << std::endl;
-    std::cout << "1. Store to Memory (M+)\n";
-    std::cout << "2. Recall Memory (MR)\n";
-    std::cout << "3. Clear Memory (MC)\n";
-    std::cout << "4. Add to Memory\n";
+    std::cout << "1. Store (MS)\n";
+    std::cout << "2. Recall (MR)\n";
+    std::cout << "3. Clear (MC)\n";
+    std::cout << "4. Add (M+)\n";
+    std::cout << "5. Subtract (M-)\n";
 
-    int choice = getValidChoice(1, 4);
+    int choice = getValidChoice(1, 5);
 
     switch (choice)
     {
@@ -1312,6 +1407,12 @@ void memoryMenu()
         memoryAdd(val);
         break;
     }
+    case 5:
+    {
+        double val = getValidNumber("Enter value to subtract: ");
+        memorySubtract(val);
+        break;
+    }
     }
 }
 
@@ -1328,32 +1429,35 @@ void displayMenu()
     std::cout << theme->secondary << "\n┌─── Basic Operations ───┐" << theme->reset << std::endl;
     std::cout << " 1. Addition            2. Subtraction         3. Multiplication\n";
     std::cout << " 4. Division            5. Modulus             6. Absolute Value\n";
+    std::cout << " 7. Percentage\n";
 
     std::cout << theme->secondary << "\n┌─── Trigonometric ───┐" << theme->reset << std::endl;
-    std::cout << " 7. sin()               8. cos()               9. tan()\n";
-    std::cout << "10. arcsin()           11. arccos()           12. arctan()\n";
-    std::cout << "13. sinh()             14. cosh()             15. tanh()\n";
+    std::cout << " 8. sin()               9. cos()              10. tan()\n";
+    std::cout << "11. cosec()            12. sec()              13. cot()\n";
+    std::cout << "14. arcsin()           15. arccos()           16. arctan()\n";
+    std::cout << "17. sinh()             18. cosh()             19. tanh()\n";
 
     std::cout << theme->secondary << "\n┌─── Exponential & Log ───┐" << theme->reset << std::endl;
-    std::cout << "16. Power (x^y)        17. e^x                18. ln(x)\n";
-    std::cout << "19. log10(x)           20. log2(x)\n";
+    std::cout << "20. Power (x^y)        21. e^x                22. ln(x)\n";
+    std::cout << "23. log10(x)           24. log2(x)            25. logₐ(x)\n";
 
     std::cout << theme->secondary << "\n┌─── Roots & Advanced ───┐" << theme->reset << std::endl;
-    std::cout << "21. Square Root        22. Cube Root          23. nth Root\n";
-    std::cout << "24. Factorial          25. Ceiling            26. Floor\n";
-    std::cout << "27. Round              28. Statistics\n";
+    std::cout << "26. Square Root        27. Cube Root          28. nth Root\n";
+    std::cout << "29. Factorial          30. Ceiling            31. Floor\n";
+    std::cout << "32. Round              33. Truncate           34. Statistics\n";
 
     std::cout << theme->secondary << "\n┌─── Conversions ───┐" << theme->reset << std::endl;
-    std::cout << "29. Deg ↔ Rad          30. Number Systems     31. Units\n";
+    std::cout << "35. Deg ↔ Rad          36. Number Systems     37. Units\n";
 
     std::cout << theme->secondary << "\n┌─── Advanced Math ───┐" << theme->reset << std::endl;
-    std::cout << "32. Permutation        33. Combination        34. GCD & LCM\n";
-    std::cout << "35. Quadratic Solver   36. Matrix Add         37. Matrix Multiply\n";
+    std::cout << "38. Permutation        39. Combination        40. GCD & LCM\n";
+    std::cout << "41. Prime Check        42. Quadratic Solver   43. Matrix Add\n";
+    std::cout << "44. Matrix Multiply    45. Matrix Transpose\n";
 
     std::cout << theme->accent << "\n┌─── ADVANCED FEATURES ───┐" << theme->reset << std::endl;
-    std::cout << "38. Expression Parser  39. Complex Numbers    40. Memory Ops\n";
-    std::cout << "41. View History       42. Save History       43. Use History Value\n";
-    std::cout << "44. Change Theme\n";
+    std::cout << "46. Expression Parser  47. Complex Numbers    48. Memory Ops\n";
+    std::cout << "49. View History       50. Save History       51. Use History Value\n";
+    std::cout << "52. Change Theme\n";
 
     std::cout << theme->error << "\n 0. Exit Calculator\n"
               << theme->reset << std::endl;
@@ -1370,7 +1474,7 @@ int main()
     do
     {
         displayMenu();
-        choice = getValidChoice(0, 44);
+        choice = getValidChoice(0, 52);
 
         if (choice == 0)
         {
@@ -1414,133 +1518,159 @@ int main()
             result = absoluteValue();
             break;
         case 7:
-            result = sine();
+            result = percentage();
             break;
         case 8:
-            result = cosine();
+            result = sine();
             break;
         case 9:
-            result = tangent();
+            result = cosine();
             break;
         case 10:
-            result = arcsine();
+            result = tangent();
             break;
         case 11:
-            result = arccosine();
+            result = cosecant();
             break;
         case 12:
-            result = arctangent();
+            result = secant();
             break;
         case 13:
-            result = hyperbolicSine();
+            result = cotangent();
             break;
         case 14:
-            result = hyperbolicCosine();
+            result = arcsine();
             break;
         case 15:
-            result = hyperbolicTangent();
+            result = arccosine();
             break;
         case 16:
-            result = power();
+            result = arctangent();
             break;
         case 17:
-            result = exponential();
+            result = hyperbolicSine();
             break;
         case 18:
-            result = naturalLog();
+            result = hyperbolicCosine();
             break;
         case 19:
-            result = log10Func();
+            result = hyperbolicTangent();
             break;
         case 20:
-            result = log2Func();
+            result = power();
             break;
         case 21:
-            result = squareRoot();
+            result = exponential();
             break;
         case 22:
-            result = cubeRoot();
+            result = naturalLog();
             break;
         case 23:
-            result = nthRoot();
+            result = log10Func();
             break;
         case 24:
-            result = factorial();
+            result = log2Func();
             break;
         case 25:
-            result = ceiling();
+            result = logBase();
             break;
         case 26:
-            result = floor();
+            result = squareRoot();
             break;
         case 27:
-            result = roundNum();
+            result = cubeRoot();
             break;
         case 28:
+            result = nthRoot();
+            break;
+        case 29:
+            result = factorial();
+            break;
+        case 30:
+            result = ceiling();
+            break;
+        case 31:
+            result = floor();
+            break;
+        case 32:
+            result = roundNum();
+            break;
+        case 33:
+            result = truncateNum();
+            break;
+        case 34:
             statistics();
             validOperation = false;
             break;
-        case 29:
+        case 35:
         {
             std::cout << "1. Degrees to Radians\n2. Radians to Degrees\n";
             int convChoice = getValidChoice(1, 2);
             result = (convChoice == 1) ? degreeToRadian() : radianToDegree();
             break;
         }
-        case 30:
+        case 36:
             numberSystemConversion();
             validOperation = false;
             break;
-        case 31:
+        case 37:
             unitConversions();
             validOperation = false;
             break;
-        case 32:
+        case 38:
             result = permutation();
             break;
-        case 33:
+        case 39:
             result = combination();
             break;
-        case 34:
+        case 40:
             gcdLcm();
             validOperation = false;
             break;
-        case 35:
-            quadraticSolver();
-            validOperation = false;
-            break;
-        case 36:
-            matrixAddition();
-            validOperation = false;
-            break;
-        case 37:
-            matrixMultiplication();
-            validOperation = false;
-            break;
-        case 38:
-            expressionCalculator();
-            validOperation = false;
-            break;
-        case 39:
-            complexNumberMenu();
-            validOperation = false;
-            break;
-        case 40:
-            memoryMenu();
-            validOperation = false;
-            break;
         case 41:
-            displayHistory();
+            primeChecker();
             validOperation = false;
             break;
         case 42:
-            saveHistoryToFile();
+            quadraticSolver();
             validOperation = false;
             break;
         case 43:
-            result = getFromHistory();
+            matrixAddition();
+            validOperation = false;
             break;
         case 44:
+            matrixMultiplication();
+            validOperation = false;
+            break;
+        case 45:
+            matrixTranspose();
+            validOperation = false;
+            break;
+        case 46:
+            expressionCalculator();
+            validOperation = false;
+            break;
+        case 47:
+            complexNumberMenu();
+            validOperation = false;
+            break;
+        case 48:
+            memoryMenu();
+            validOperation = false;
+            break;
+        case 49:
+            displayHistory();
+            validOperation = false;
+            break;
+        case 50:
+            saveHistoryToFile();
+            validOperation = false;
+            break;
+        case 51:
+            result = getFromHistory();
+            break;
+        case 52:
             changeTheme();
             validOperation = false;
             break;
